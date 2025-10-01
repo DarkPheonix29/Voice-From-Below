@@ -2102,6 +2102,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 4849219945184648535, guid: a266d620e3a3a694db861659068bbe06, type: 3}
+      propertyPath: far clip plane
+      value: 1500
+      objectReference: {fileID: 0}
     - target: {fileID: 9003737051263742622, guid: a266d620e3a3a694db861659068bbe06, type: 3}
       propertyPath: m_LocalPosition.x
       value: 959.324
