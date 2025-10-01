@@ -3,36 +3,43 @@ using UnityEngine.InputSystem;
 
 public class cam : MonoBehaviour
 {
-    public float MouseSensitivity = 100f;
     public Transform playerbody;
 
-    private float Xrotation = 0f;
-    private InputAction lookAction;
+    [Header("Look Settings")]
+    [Range(0.1f, 10f)]
+    public float sensitivity = 1f; // later instelbaar via SettingsManager
+
+    private float xRot = 0f;
+    private InputAction look;
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
 
         var map = new InputActionMap("Camera");
-
-        lookAction = map.AddAction("Look");
-        lookAction.AddBinding("<Mouse>/delta");
-        lookAction.AddBinding("<Gamepad>/rightStick").WithProcessor("stickDeadzone(min=0.2)");
-
+        look = map.AddAction("Look");
+        look.AddBinding("<Mouse>/delta");
         map.Enable();
     }
 
     void Update()
     {
-        Vector2 look = lookAction.ReadValue<Vector2>();
+        Vector2 delta = look.ReadValue<Vector2>();
 
-        float mousex = look.x * MouseSensitivity * Time.deltaTime;
-        float mousey = look.y * MouseSensitivity * Time.deltaTime;
+        // Schaal pixel-delta → ongeveer gelijk aan oude Input.GetAxis
+        float mouseX = delta.x * 0.075f * sensitivity;
+        float mouseY = delta.y * 0.075f * sensitivity;
 
-        Xrotation -= mousey;
-        Xrotation = Mathf.Clamp(Xrotation, -90f, 90f);
+        xRot -= mouseY;
+        xRot = Mathf.Clamp(xRot, -90f, 90f);
 
-        transform.localRotation = Quaternion.Euler(Xrotation, 0f, 0f);
-        playerbody.Rotate(Vector3.up * mousex);
+        transform.localRotation = Quaternion.Euler(xRot, 0, 0);
+        playerbody.Rotate(Vector3.up * mouseX);
+    }
+
+    // Kan later vanuit je SettingsManager aangeroepen worden
+    public void SetSensitivity(float value)
+    {
+        sensitivity = value;
     }
 }
