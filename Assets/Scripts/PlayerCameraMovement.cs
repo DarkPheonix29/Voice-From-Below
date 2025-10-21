@@ -1,12 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[DisallowMultipleComponent]
 public class cam : MonoBehaviour
 {
     public Transform playerbody;
 
-    [Range(0.1f, 10f)]
-    public float sensitivity = 1f;
+    [Range(0.1f, 10f)] public float sensitivity = 1f;
 
     public float bobAmplitude = 0.05f;
     public float bobFrequency = 8f;
@@ -87,6 +87,5 @@ public class cam : MonoBehaviour
             transform.localPosition = Vector3.Lerp(transform.localPosition, restLocalPos, Time.deltaTime * returnSpeed);
         }
     }
-
-    public void SetSensitivity(float value) => sensitivity = value;
 }
+    
