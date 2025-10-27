@@ -4,8 +4,14 @@ using UnityEngine;
 public class Climbable : MonoBehaviour
 {
     [Header("Segment")]
+<<<<<<< Updated upstream
     public Transform bottom;              // start point (world-space)
     public Transform top;                 // end point (world-space)
+=======
+    public Transform bottom;   // start point of the chain
+    public Transform top;      // end point of the chain
+    public float snapRadius = 0.4f;   // how tightly we lock player onto the chain
+>>>>>>> Stashed changes
 
     [Header("Prompt")]
     public string grabPrompt = "Press E to grab chain";
@@ -15,7 +21,11 @@ public class Climbable : MonoBehaviour
     void Awake()
     {
         _interact = GetComponent<Interactable>();
+<<<<<<< Updated upstream
         if (_interact) _interact.oneShot = false; // can reuse infinitely
+=======
+        if (_interact) _interact.oneShot = false;
+>>>>>>> Stashed changes
     }
 
     void Start()
@@ -28,13 +38,19 @@ public class Climbable : MonoBehaviour
         Vector3 a = bottom.position;
         Vector3 b = top.position;
         Vector3 ab = b - a;
+<<<<<<< Updated upstream
         float abSqr = ab.sqrMagnitude;
         if (abSqr < 1e-6f) return a;
         float t = Mathf.Clamp01(Vector3.Dot(worldPos - a, ab) / abSqr);
+=======
+        float t = Vector3.Dot(worldPos - a, ab) / ab.sqrMagnitude;
+        t = Mathf.Clamp01(t);
+>>>>>>> Stashed changes
         return a + ab * t;
     }
 
     public Vector3 UpDir => (top.position - bottom.position).normalized;
+<<<<<<< Updated upstream
     public float Length => Vector3.Distance(bottom.position, top.position);
 
     public void Grab()
@@ -67,4 +83,21 @@ public class Climbable : MonoBehaviour
         UnityEditor.Handles.Label(mid, $"len: {Vector3.Distance(bottom.position, top.position):F2} m");
     }
 #endif
+=======
+    public float Length => Vector3.Distance(top.position, bottom.position);
+
+    // Climbable.cs (add this inside the class)
+    public void Grab()
+    {
+        // Find the player's climber (cache this in Awake if you prefer)
+        var climber = FindObjectOfType<PlayerClimber>();
+        if (!climber)
+        {
+            Debug.LogWarning("[Climbable] No PlayerClimber found in scene.");
+            return;
+        }
+
+        climber.BeginClimb(this);
+    }
+>>>>>>> Stashed changes
 }
