@@ -149,43 +149,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8.29
+      value: 483.684
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.524
+      value: 0.47
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 12.75
+      value: 480.88193
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.49119768
+      value: 0.40966538
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.50865006
+      value: -0.12049278
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.49119768
+      value: 0.56184566
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.50865006
+      value: -0.7085092
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -92
+      value: -224.22101
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 90
+      value: -118.287
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 87.36
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       propertyPath: m_RenderingLayerMask
@@ -210,10 +210,13 @@ PrefabInstance:
       addedObject: {fileID: 5224205437319797828}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7298424712344167699}
+      addedObject: {fileID: 2856965055557430360}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2856965055557430360}
+      addedObject: {fileID: 6526903183963053917}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7844887872210757026}
   m_SourcePrefab: {fileID: 100100000, guid: f0c8feb3aa53f8c499e8190cba7fe61d, type: 3}
 --- !u!4 &6213353044667827736 stripped
 Transform:
@@ -273,22 +276,6 @@ MonoBehaviour:
   swayAngle: 1.2
   swayFrequency: 1.4
   swayLerpSpeed: 7
---- !u!114 &7298424712344167699
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6733324547064650914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93666903bee60f04fa8e5fdef03201d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FlashlightPickup
-  flashlight: {fileID: 5224205437319797828}
-  attachPoint: {fileID: 0}
-  attachLocalPos: {x: 0, y: 0, z: 0}
-  attachLocalRotEuler: {x: 0, y: 0, z: 0}
 --- !u!54 &2856965055557430360
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -316,3 +303,55 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &6526903183963053917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6733324547064650914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5f34cb97a261664f9f5743f644369c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickupItemAction
+  itemId: Flashlight
+  worldModelToHide: {fileID: 0}
+  attachOnPickup: 1
+  attachPoint: {fileID: 0}
+  attachLocalPos: {x: 0, y: 0, z: 0}
+  attachLocalEuler: {x: 0, y: 0, z: 0}
+  flashlightToAttach: {fileID: 5224205437319797828}
+  flashlightPrefabToSpawn: {fileID: 5224205437319797828}
+  attachIfOwnedOnStart: 1
+--- !u!114 &7844887872210757026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6733324547064650914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af384cceb619cab4586a5b1bd8fa7f7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
+  promptCanvas: {fileID: 0}
+  promptLabel: {fileID: 0}
+  promptText: Press E to interact
+  oneShot: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6526903183963053917}
+        m_TargetAssemblyTypeName: PickupItemAction, Assembly-CSharp
+        m_MethodName: DoPickup
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
