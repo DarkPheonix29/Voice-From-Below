@@ -1883,6 +1883,63 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -1801400722603231261, guid: 5053869ba73eda74d84746138aa662b3, type: 3}
+--- !u!1001 &662274391
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6213353044667827736, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 349.9336
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213353044667827736, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 4.0197487
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213353044667827736, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 573.84644
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213353044667827736, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.40966538
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213353044667827736, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.12049278
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213353044667827736, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.56184566
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213353044667827736, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.7085092
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213353044667827736, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -224.22101
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213353044667827736, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -118.287
+      objectReference: {fileID: 0}
+    - target: {fileID: 6213353044667827736, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 87.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 6733324547064650914, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
+      propertyPath: m_Name
+      value: flashlight
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
 --- !u!1001 &684847561
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5448,3 +5505,4 @@ SceneRoots:
   - {fileID: 1865628406}
   - {fileID: 1454881950}
   - {fileID: 622209954}
+  - {fileID: 662274391}
