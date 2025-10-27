@@ -1,4 +1,4 @@
-%YAML 1.1
+﻿%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!29 &1
 OcclusionCullingSettings:
@@ -23,11 +23,8 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-<<<<<<< Updated upstream
   m_AmbientIntensity: 1
-=======
   m_AmbientIntensity: 0
->>>>>>> Stashed changes
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
@@ -123,9 +120,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
-<<<<<<< Updated upstream
 --- !u!1 &53835563
-=======
 --- !u!1001 &2200986
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -623,7 +618,6 @@ Transform:
   m_PrefabInstance: {fileID: 19258641}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &23438381
->>>>>>> Stashed changes
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -658,7 +652,6 @@ Camera:
   m_GameObject: {fileID: 53835563}
   m_Enabled: 1
   serializedVersion: 2
-<<<<<<< Updated upstream
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
@@ -702,7 +695,6 @@ Camera:
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
 --- !u!4 &53835566
-=======
   m_Modification:
     serializedVersion: 3
     m_TransformParent: {fileID: 492342684}
@@ -4471,7 +4463,6 @@ GameObject:
   m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &273083873
->>>>>>> Stashed changes
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4480,10 +4471,8 @@ Transform:
   m_GameObject: {fileID: 53835563}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-<<<<<<< Updated upstream
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
-=======
   m_LocalPosition: {x: 501.9, y: 2.1, z: 622}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
@@ -12189,14 +12178,11 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 468.16, y: -0.46, z: 510.1}
   m_LocalScale: {x: 3, y: 3, z: 3}
->>>>>>> Stashed changes
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-<<<<<<< Updated upstream
 --- !u!1 &1727992231
-=======
 --- !u!1001 &720237913
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24079,7 +24065,6 @@ Light:
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
 --- !u!1 &1403221079
->>>>>>> Stashed changes
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -24096,9 +24081,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
-<<<<<<< Updated upstream
 --- !u!108 &1727992232
-=======
 --- !u!4 &1403221080
 Transform:
   m_ObjectHideFlags: 0
@@ -26844,7 +26827,6 @@ MonoBehaviour:
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
 --- !u!108 &1524193258
->>>>>>> Stashed changes
 Light:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -26917,7 +26899,6 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1727992231}
   serializedVersion: 2
-<<<<<<< Updated upstream
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -26925,7 +26906,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
-=======
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0.407, y: -0.119, z: -0.386}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -36201,34 +36181,9 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.36, y: 1.47, z: 1.22}
   m_Center: {x: 0.1370455, y: -0.024667984, z: -0.022519505}
->>>>>>> Stashed changes
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-<<<<<<< Updated upstream
   - {fileID: 53835566}
   - {fileID: 1727992233}
-=======
-  - {fileID: 1480566250}
-  - {fileID: 492342684}
-  - {fileID: 1785398895}
-  - {fileID: 1403221080}
-  - {fileID: 1571659475}
-  - {fileID: 712897058}
-  - {fileID: 1885446083}
-  - {fileID: 273083873}
-  - {fileID: 2146611006}
-  - {fileID: 515529689}
-  - {fileID: 817907011}
-  - {fileID: 1047020593}
-  - {fileID: 1297875328}
-  - {fileID: 1151388027893827143}
-  - {fileID: 1403726601}
-  - {fileID: 1422654869}
-  - {fileID: 1269994579}
-  - {fileID: 1491673889}
-  - {fileID: 694333333}
-  - {fileID: 1909109627}
-  - {fileID: 318122791}
->>>>>>> Stashed changes
