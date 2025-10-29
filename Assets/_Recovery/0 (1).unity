@@ -509,36 +509,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BoxDrag
   size: 0
   canBeCarried: 1
-  dragForce: 600
+  dragForce: 700
   maxDragSpeed: 6
   holdDistance: 2
-  targetSmoothTime: 0.12
-  breakDistance: 9
-  linearDragWhileDrag: 4
-  angularDragWhileDrag: 2
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  maxSlopeAngle: 45
-  groundRayDistance: 30
-  kpGround: 12
-  kdGround: 6.9
-  maxDeltaVPerStepGround: 1.3
-  maxDragSpeedGround: 4.5
-  groundStickForce: 30
-  groundSnapDistance: 0.3
-  keepUpright: 1
-  hardUprightWhileDrag: 0
-  maxTiltDeg: 8
-  uprightKp: 120
-  uprightKd: 18
-  maxAngularSpeedDeg: 180
-  lowFrictionMaterial: {fileID: 0}
-  comLowerWhileDrag: 0.1
-  scrollRotateDegreesPerNotch: 8
-  invertScroll: 0
   autoTuneBySize: 1
-  _lastTunedSize: 0
 --- !u!54 &414327585
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -653,7 +627,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.736, y: 0.805, z: 11.73}
-  m_LocalScale: {x: 100, y: 100, z: 100}
+  m_LocalScale: {x: 80, y: 80, z: 80}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1651,36 +1625,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BoxDrag
   size: 2
   canBeCarried: 0
-  dragForce: 600
+  dragForce: 320
   maxDragSpeed: 3.2
-  holdDistance: 2
-  targetSmoothTime: 0.14
-  breakDistance: 10
-  linearDragWhileDrag: 4.5
-  angularDragWhileDrag: 2.2
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  maxSlopeAngle: 45
-  groundRayDistance: 30
-  kpGround: 10
-  kdGround: 6.3245554
-  maxDeltaVPerStepGround: 1.1
-  maxDragSpeedGround: 4
-  groundStickForce: 30
-  groundSnapDistance: 0.3
-  keepUpright: 1
-  hardUprightWhileDrag: 0
-  maxTiltDeg: 8
-  uprightKp: 120
-  uprightKd: 18
-  maxAngularSpeedDeg: 180
-  lowFrictionMaterial: {fileID: 0}
-  comLowerWhileDrag: 0.1
-  scrollRotateDegreesPerNotch: 8
-  invertScroll: 0
+  holdDistance: 2.5
   autoTuneBySize: 1
-  _lastTunedSize: 2
 --- !u!54 &1583656071
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1795,7 +1743,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -1.751, y: 0.7907441, z: 13.45}
-  m_LocalScale: {x: 120, y: 120, z: 120}
+  m_LocalScale: {x: 80, y: 80, z: 80}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1866,36 +1814,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BoxDrag
   size: 1
   canBeCarried: 0
-  dragForce: 600
+  dragForce: 500
   maxDragSpeed: 4.5
-  holdDistance: 2
-  targetSmoothTime: 0.12
-  breakDistance: 9
-  linearDragWhileDrag: 4
-  angularDragWhileDrag: 2
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  maxSlopeAngle: 45
-  groundRayDistance: 30
-  kpGround: 12
-  kdGround: 6.928203
-  maxDeltaVPerStepGround: 1.3
-  maxDragSpeedGround: 4.5
-  groundStickForce: 30
-  groundSnapDistance: 0.3
-  keepUpright: 0
-  hardUprightWhileDrag: 0
-  maxTiltDeg: 8
-  uprightKp: 120
-  uprightKd: 18
-  maxAngularSpeedDeg: 180
-  lowFrictionMaterial: {fileID: 0}
-  comLowerWhileDrag: 0.1
-  scrollRotateDegreesPerNotch: 8
-  invertScroll: 0
+  holdDistance: 2.2
   autoTuneBySize: 1
-  _lastTunedSize: 1
 --- !u!54 &1826512015
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2010,7 +1932,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 1.0996289, y: 0.7907441, z: 13.45}
-  m_LocalScale: {x: 120, y: 120, z: 120}
+  m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

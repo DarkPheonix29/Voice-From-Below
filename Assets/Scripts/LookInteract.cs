@@ -62,10 +62,18 @@ public class LookInteract : MonoBehaviour
         if (Keyboard.current[interactKey].wasPressedThisFrame && hitSomething)
         {
             // flashlight?
-            var pickup = hit.collider.GetComponentInParent<FlashlightPickup>();
-            if (pickup != null)
+            var flashlightPickup = hit.collider.GetComponentInParent<FlashlightPickup>();
+            if (flashlightPickup != null)
             {
-                pickup.DoPickup();
+                flashlightPickup.DoPickup();
+                return;
+            }
+
+            // walkie talkie?
+            var walkiePickup = hit.collider.GetComponentInParent<WalkieTalkiePickup>();
+            if (walkiePickup != null)
+            {
+                walkiePickup.DoPickup();
                 return;
             }
 

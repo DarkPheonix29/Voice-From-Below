@@ -51,6 +51,9 @@ public class FPPlayer : MonoBehaviour
     bool isCrouching;
     bool isSprinting;
 
+    // Nieuw: latch om sprint opnieuw indrukken te vereisen na lege stamina
+    bool sprintReleaseRequired;
+
     InputAction move, jump, crouch, sprint;
 
     Vector3 bodyScaleStart;
@@ -218,16 +221,44 @@ public class FPPlayer : MonoBehaviour
         controller.center = Vector3.Lerp(controller.center, targetCenter, Time.deltaTime * controllerLerpSpeed);
     }
 
+    // AANGEPAST: sprint met "latch" — na lege stamina moet je loslaten en opnieuw indrukken
     void HandleSprint(Vector2 input)
     {
-        bool moving = input.sqrMagnitude > 0.01f;
-        bool canSprint = stamina > minStaminaToSprint && moving && !isCrouching;
-        bool wants = sprint.IsPressed();
+        bool moving        = input.sqrMagnitude > 0.01f;
+        bool wantsHeld     = sprint.IsPressed();
+        bool wantsReleased = sprint.WasReleasedThisFrame();
 
-        isSprinting = (stamina > 0f) && canSprint && wants;
+        // Als sprint aan staat en stamina raakt 0, forceer stop en vereis loslaten
+        if (isSprinting && stamina <= 0f)
+        {
+            sprintReleaseRequired = true;
+            isSprinting = false;
+        }
 
-        if (isSprinting) stamina = Mathf.Max(0f, stamina - staminaDrainRate * Time.deltaTime);
-        else stamina = Mathf.Min(maxStamina, stamina + staminaRegenRate * Time.deltaTime);
+        // Loslaten van sprint heft de vereiste op
+        if (wantsReleased)
+            sprintReleaseRequired = false;
+
+        // Voorwaarden om te (blijven) sprinten
+        bool canSprint = stamina > minStaminaToSprint && moving && !isCrouching && !sprintReleaseRequired;
+
+        // Starten of blijven sprinten zolang knop vastgehouden wordt en voorwaarden kloppen
+        if (wantsHeld && canSprint)
+        {
+            isSprinting = true;
+        }
+        else
+        {
+            // Stoppen bij loslaten, stilstand, crouch of (veiligheid) bij 0 stamina
+            if (!wantsHeld || !moving || isCrouching || stamina <= 0f)
+                isSprinting = false;
+        }
+
+        // Drain / regen
+        if (isSprinting)
+            stamina = Mathf.Max(0f, stamina - staminaDrainRate * Time.deltaTime);
+        else
+            stamina = Mathf.Min(maxStamina, stamina + staminaRegenRate * Time.deltaTime);
     }
 
     void UpdateStaminaUI()
