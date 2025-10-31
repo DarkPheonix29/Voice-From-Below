@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &86513869881062524
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2465133034475668188}
+  m_Layer: 0
+  m_Name: WalkiTalkieHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2465133034475668188
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86513869881062524}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.29883626, y: -0.6408564, z: -0.6408564, w: -0.29883626}
+  m_LocalPosition: {x: -0.4, y: -0.2, z: 0.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5249191395345158177}
+  m_LocalEulerAnglesHint: {x: -90, y: 270, z: 220}
 --- !u!1 &489265234048408390
 GameObject:
   m_ObjectHideFlags: 0
@@ -75,6 +106,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &573987603700557433
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3890914943455947975}
+  m_Layer: 0
+  m_Name: BoxHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3890914943455947975
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 573987603700557433}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5249191395345158177}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2334974273109021736
 GameObject:
   m_ObjectHideFlags: 0
@@ -135,13 +197,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3659421316693819119}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.21263108, y: 0.21263108, z: 0.67437977, w: 0.67437977}
+  m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
   m_LocalPosition: {x: 0.25, y: -0.263, z: 0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5249191395345158177}
-  m_LocalEulerAnglesHint: {x: 215, y: 180, z: 270}
+  m_LocalEulerAnglesHint: {x: 90, y: 180, z: 270}
 --- !u!1 &3746007977827057265
 GameObject:
   m_ObjectHideFlags: 0
@@ -152,10 +214,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4426351618526396816}
   - component: {fileID: 3558684702706341386}
+  - component: {fileID: 3867416224066807028}
   - component: {fileID: 2069055084509252345}
   - component: {fileID: 9203006501987458209}
-  - component: {fileID: 5546666552151478284}
-  - component: {fileID: 2895103189128914099}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -171,8 +232,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3746007977827057265}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.08367776, z: 0, w: 0.9964929}
-  m_LocalPosition: {x: -0.8651338, y: 1.6696198, z: -0.39823747}
+  m_LocalRotation: {x: 0, y: -0.08367762, z: 0, w: 0.9964929}
+  m_LocalPosition: {x: 3.23, y: 1.7, z: 1.63}
   m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -181,7 +242,7 @@ Transform:
   - {fileID: 3470264894936492794}
   - {fileID: 9116924540978333383}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -9.6, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &3558684702706341386
 CharacterController:
   m_ObjectHideFlags: 0
@@ -207,6 +268,25 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3867416224066807028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3746007977827057265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ed47e8385251c14bb8a64ef040ca389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LookInteract
+  cam: {fileID: 5249191395345158177}
+  interactDistance: 5
+  interactRadius: 0.25
+  interactMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  interactKey: 19
 --- !u!114 &2069055084509252345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,68 +353,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &5546666552151478284
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3746007977827057265}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7abfa3386e3a7e47b6f2987928b6942, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
-  cam: {fileID: 4438911949873305345}
-  interactDistance: 2
-  interactRadius: 0.2
-  interactMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  interactAction:
-    m_Name: Interact
-    m_Type: 1
-    m_ExpectedControlType: 
-    m_Id: 1af4da7b-c6c6-417b-b9db-ac7351ee4cb5
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: 334c275c-76f4-4d13-b2d4-8cfd88c00517
-      m_Path: <Keyboard>/e
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Interact
-      m_Flags: 0
-    m_Flags: 0
---- !u!114 &2895103189128914099
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3746007977827057265}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f1c0662e67a07a42b9577791a1aed55, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerClimber
-  cameraRoot: {fileID: 5249191395345158177}
-  cc: {fileID: 3558684702706341386}
-  rb: {fileID: 9203006501987458209}
-  climbSpeed: 3.5
-  detachJumpForce: 4.5
-  detachKey: 32
-  moveY:
-    m_Name: Move Y
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: eb6f726d-d1ea-4643-aace-c6fe37c58879
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
 --- !u!1 &4763656986374264434
 GameObject:
   m_ObjectHideFlags: 0
@@ -362,13 +380,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4763656986374264434}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.997011, z: -0, w: -0.07726044}
-  m_LocalPosition: {x: 0, y: 0.37, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4426351618526396816}
-  m_LocalEulerAnglesHint: {x: 0, y: -188.862, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7761463071092149320
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -865,6 +883,7 @@ GameObject:
   - component: {fileID: 7478151488695462697}
   - component: {fileID: 1783872236596567327}
   - component: {fileID: 5891264307503552926}
+  - component: {fileID: 7857003921895435473}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -886,6 +905,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5752356741248400055}
+  - {fileID: 2465133034475668188}
+  - {fileID: 3890914943455947975}
   m_Father: {fileID: 9116924540978333383}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &4438911949873305345
@@ -919,9 +940,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.01
+  near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 40
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1012,3 +1033,22 @@ MonoBehaviour:
   moveThreshold: 0.02
   sprintBobMultiplier: 1.8
   crouchBobMultiplier: 0.5
+--- !u!114 &7857003921895435473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8934981145303029531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d452754e27e65e94cac5cb5f28df5c65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBoxInteractor
+  cam: {fileID: 5249191395345158177}
+  interactMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  interactDistance: 4
+  interactRadius: 0.25
+  dragStartDelta: 6
