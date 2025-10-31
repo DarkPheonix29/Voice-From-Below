@@ -286,7 +286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
   cam: {fileID: 4438911949873305345}
-  interactDistance: 2
+  interactDistance: 3
   interactRadius: 0.2
   interactMask:
     serializedVersion: 2
@@ -320,12 +320,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f1c0662e67a07a42b9577791a1aed55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerClimber
-  cameraRoot: {fileID: 5249191395345158177}
   cc: {fileID: 3558684702706341386}
   rb: {fileID: 9203006501987458209}
+  disableWhileClimbing: []
   climbSpeed: 3.5
-  detachJumpForce: 4.5
   detachKey: 32
+  lateralOffset: 0.35
+  debugDraw: 0
   moveY:
     m_Name: Move Y
     m_Type: 0
