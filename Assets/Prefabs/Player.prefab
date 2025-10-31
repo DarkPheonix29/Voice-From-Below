@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &86513869881062524
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2465133034475668188}
+  m_Layer: 0
+  m_Name: WalkiTalkieHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2465133034475668188
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86513869881062524}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.29883626, y: -0.6408564, z: -0.6408564, w: -0.29883626}
+  m_LocalPosition: {x: -0.4, y: -0.2, z: 0.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5249191395345158177}
+  m_LocalEulerAnglesHint: {x: -90, y: 270, z: 220}
 --- !u!1 &489265234048408390
 GameObject:
   m_ObjectHideFlags: 0
@@ -75,6 +106,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &573987603700557433
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3890914943455947975}
+  m_Layer: 0
+  m_Name: BoxHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3890914943455947975
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 573987603700557433}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5249191395345158177}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2334974273109021736
 GameObject:
   m_ObjectHideFlags: 0
@@ -171,7 +233,7 @@ Transform:
   m_GameObject: {fileID: 3746007977827057265}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.08367762, z: 0, w: 0.9964929}
-  m_LocalPosition: {x: -0.8651338, y: 1.6696198, z: -0.39823747}
+  m_LocalPosition: {x: 3.23, y: 1.7, z: 1.63}
   m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -821,6 +883,7 @@ GameObject:
   - component: {fileID: 7478151488695462697}
   - component: {fileID: 1783872236596567327}
   - component: {fileID: 5891264307503552926}
+  - component: {fileID: 7857003921895435473}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -842,6 +905,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5752356741248400055}
+  - {fileID: 2465133034475668188}
+  - {fileID: 3890914943455947975}
   m_Father: {fileID: 9116924540978333383}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &4438911949873305345
@@ -968,3 +1033,22 @@ MonoBehaviour:
   moveThreshold: 0.02
   sprintBobMultiplier: 1.8
   crouchBobMultiplier: 0.5
+--- !u!114 &7857003921895435473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8934981145303029531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d452754e27e65e94cac5cb5f28df5c65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBoxInteractor
+  cam: {fileID: 5249191395345158177}
+  interactMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  interactDistance: 4
+  interactRadius: 0.25
+  dragStartDelta: 6
