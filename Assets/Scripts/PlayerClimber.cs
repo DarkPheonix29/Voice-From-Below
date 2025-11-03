@@ -2,14 +2,16 @@ using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+using System.Collections;
 using System.Collections.Generic;
 
+[DefaultExecutionOrder(-50)]
 public class PlayerClimber : MonoBehaviour
 {
     [Header("Refs")]
-    public CharacterController cc;                   // REQUIRED (do not scale the CC GameObject)
-    public Rigidbody rb;                             // optional; set kinematic during climb to avoid physics fights
-    public MonoBehaviour[] disableWhileClimbing;     // e.g. FP Player (Script), headbob, camera sway
+    public CharacterController cc; 
+    public Rigidbody rb; 
+    public MonoBehaviour[] disableWhileClimbing; 
 
     [Header("Climb")]
     public float climbSpeed = 5f;
@@ -17,24 +19,41 @@ public class PlayerClimber : MonoBehaviour
     [Tooltip("Push the player a bit off the chain axis so the capsule doesn't live inside link colliders.")]
     public float lateralOffset = 0.35f;
 
+    [Tooltip("Min absolute input to count as intentional climb.")]
+    public float inputDeadzone = 0.05f;
+
+    [Tooltip("Stay attached even with zero input for this many seconds after a grab.")]
+    public float clingGraceTime = 0.30f;
+
     [Header("Debug")]
-    public bool debugDraw = false;                   // turn gizmos/logs on/off
+    public bool debugDraw = false;
 
 #if ENABLE_INPUT_SYSTEM
     public InputAction moveY = new InputAction(type: InputActionType.Value, binding: "<Gamepad>/leftStick/y");
-    void OnEnable(){ moveY.Enable(); }
-    void OnDisable(){ moveY.Disable(); }
+    void OnEnable() { moveY.Enable(); }
+    void OnDisable() { moveY.Disable(); }
 #endif
 
     // runtime state
     Climbable _chain;
     bool _climbing;
-    bool _skipOneFrame;              // avoid a big delta right after BeginClimb
-    Vector3 _A, _B, _ABnorm, _side;  // chain axis (world space) + a stable sideways direction
-    float _length, _s;               // length of chain; param s in [0..length]
+    Vector3 _A, _B, _ABnorm, _side; 
+    float _length, _s; 
+    float _clingTimer; // Time remaining until auto-detach without input
 
-    // if you temporarily want to disable the chain's colliders to avoid snagging
+    public bool IsSnapping { get; private set; }
+    public bool IsClimbing => _climbing;
+    public float CurrentClimbSpeed { get; private set; }
+
     readonly List<Collider> _disabledChainCols = new List<Collider>();
+
+    // cache CC settings while climbing
+    float _savedStepOffset, _savedSlopeLimit;
+    const float kMinStepOffset = 0.01f; // <-- strictly positive
+
+    // snap coroutine mgmt
+    Coroutine _snapCo;
+    int _snapGen; 
 
     void Reset()
     {
@@ -42,23 +61,28 @@ public class PlayerClimber : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-    public bool IsClimbing => _climbing;
-
     void Update()
     {
-        if (!_climbing) return;
+        if (!_climbing || IsSnapping)
+        {
+            CurrentClimbSpeed = 0f;
+            return;
+        }
 
-        // --- DETACH ---
+        // --- DETACH (manual) ---
 #if ENABLE_INPUT_SYSTEM
         bool detach = Keyboard.current?.spaceKey.wasPressedThisFrame == true;
 #else
         bool detach = Input.GetKeyDown(detachKey);
 #endif
-        if (detach) { EndClimb(false); return; }
+        if (detach)
+        {
+            CurrentClimbSpeed = 0f;
+            EndClimb(false);
+            return;
+        }
 
-        // --- MOVE ---
-        if (_skipOneFrame) { _skipOneFrame = false; return; } // prevent a huge first delta
-
+        // --- INPUT ---
         float y = 0f;
 #if ENABLE_INPUT_SYSTEM
         y = moveY.ReadValue<float>();
@@ -68,11 +92,42 @@ public class PlayerClimber : MonoBehaviour
         y = (Input.GetKey(KeyCode.W) ? 1f : 0f) - (Input.GetKey(KeyCode.S) ? 1f : 0f);
 #endif
 
-        _s = Mathf.Clamp(_s + y * climbSpeed * Time.deltaTime, 0f, _length);
+        bool hasInput = Mathf.Abs(y) >= inputDeadzone;
+        float signedSpeed = 0f;
 
-        // auto-detach at ends (nice UX)
+        // --- CLING / AUTO-DETACH LOGIC (NEW FIXED LOGIC) ---
+        
+        if (hasInput)
+        {
+            // If the player is actively moving, refresh the timer and set speed
+            _clingTimer = clingGraceTime;
+            signedSpeed = y * climbSpeed;
+        }
+        else
+        {
+            // If no input, drain the grace timer
+            _clingTimer = Mathf.Max(0f, _clingTimer - Time.deltaTime);
+            
+            // If the grace timer runs out AND we still have no input, detach.
+            if (_clingTimer <= 0f)
+            {
+                CurrentClimbSpeed = 0f;
+                EndClimb(false);
+                return;
+            }
+            // If we are stationary but _clingTimer > 0, signedSpeed remains 0.
+        }
+
+        // advance along chain
+        _s = Mathf.Clamp(_s + signedSpeed * Time.deltaTime, 0f, _length);
+
+        // publish absolute climb speed for cadence
+        CurrentClimbSpeed = Mathf.Abs(signedSpeed);
+
+        // auto-detach at ends
         if (_s <= 0.001f || _s >= _length - 0.001f)
         {
+            CurrentClimbSpeed = 0f;
             EndClimb(false);
             return;
         }
@@ -81,7 +136,7 @@ public class PlayerClimber : MonoBehaviour
 
         // move controller directly to target; CC resolves collisions
         Vector3 delta = target - transform.position;
-        cc.Move(delta);
+        if (CCReady()) cc.Move(delta);
 
         if (debugDraw)
         {
@@ -98,6 +153,7 @@ public class PlayerClimber : MonoBehaviour
         if (!cc) { Debug.LogWarning("PlayerClimber: needs CharacterController on the same object."); return; }
         if (_climbing) return;
 
+        // compute axis data
         Vector3 A = c.bottom.position;
         Vector3 B = c.top.position;
         Vector3 AB = B - A;
@@ -123,38 +179,85 @@ public class PlayerClimber : MonoBehaviour
             rb.isKinematic = true;
         }
 
-        _s = Mathf.Clamp(Vector3.Dot(transform.position - _A, _ABnorm), 0f, _length);
-        Vector3 snap = _A + _ABnorm * _s + _side * lateralOffset;
+        CacheCCSettings();
+        ClimbCCSettings(); 
 
-        cc.enabled = false;
-        transform.position = snap;
-        cc.enabled = true;
+        // Mark climbing & snapping FIRST so FPPlayer can skip its Move this frame
+        _climbing = true;
+        IsSnapping = true;
+        CurrentClimbSpeed = 0f;
+        _clingTimer = clingGraceTime; // CRITICAL: Timer set high on start
 
-        // 🩹 FIX: lift slightly so CC isn’t grounded
-        cc.Move(Vector3.up * 0.1f);
+        // cancel any prior snap
+        if (_snapCo != null) StopCoroutine(_snapCo);
+        _snapGen++;
+        _snapCo = StartCoroutine(SnapIntoClimbPosition(_snapGen));
+    }
 
+    IEnumerator SnapIntoClimbPosition(int gen)
+    {
+        // 1. Wait for the absolute end of the frame. 
+        yield return new WaitForEndOfFrame(); 
+        if (gen != _snapGen) yield break;
+
+        // 2. Calculate the total delta required for the snap.
+        
+        // --- CRITICAL FIX: Add a buffer to prevent immediate end-of-chain detach. ---
+        float buffer = 0.5f; // Place 0.5 units away from the actual ends
+        float minS = Mathf.Min(buffer, _length / 2f);
+        float maxS = Mathf.Max(_length - buffer, _length / 2f);
+        
+        // Calculate the raw 's' value based on projection
+        float projectedS = Vector3.Dot(transform.position - _A, _ABnorm);
+        
+        // Clamp 's' to prevent it from sitting too close to 0 or _length
+        _s = Mathf.Clamp(projectedS, minS, maxS);
+        // -----------------------------------------------------------------------------
+
+        Vector3 snapTarget = _A + _ABnorm * _s + _side * lateralOffset;
+        Vector3 snapDelta = snapTarget - transform.position;
+        
+        Vector3 halfDelta = snapDelta / 2f;
+
+        if (CCReady()) cc.Move(halfDelta); // First half of the snap move
+        yield return null;
+        if (gen != _snapGen) yield break;
+
+        if (CCReady()) cc.Move(halfDelta); // Second half of the snap move
+
+        // face sideways (towards _side)
         Vector3 face = _side; face.y = 0f;
         if (face.sqrMagnitude > 0.001f) transform.forward = face.normalized;
 
         ToggleChainColliders(false);
 
-        _climbing = true;
-        _skipOneFrame = true;
+        // safety wait
+        yield return null;
+        if (gen != _snapGen) yield break;
+
+        IsSnapping = false;
 
         if (debugDraw)
-            Debug.Log($"[Climber] Begin climb on '{c.name}' len={_length:F2} start s={_s:F2}");
+            Debug.Log($"[Climber] Begin climb on '{_chain.name}' len={_length:F2} start s={_s:F2}");
     }
 
     public void EndClimb(bool jumpOff)
     {
+        CurrentClimbSpeed = 0f;
         if (!_climbing) return;
 
-        // restore scripts/physics
+        // stop snap coroutine if it's still running
+        if (_snapCo != null) StopCoroutine(_snapCo);
+        _snapGen++;
+        _snapCo = null;
+        IsSnapping = false;
+
         SetEnabled(disableWhileClimbing, true);
         if (rb) rb.isKinematic = false;
 
-        // re-enable chain colliders
         ToggleChainColliders(true);
+
+        RestoreCCSettings();
 
         if (debugDraw)
             Debug.Log($"[Climber] End climb at s={_s:F2} pos={transform.position}");
@@ -164,6 +267,11 @@ public class PlayerClimber : MonoBehaviour
     }
 
     // ------- helpers -------
+    bool CCReady()
+    {
+        return cc && cc.enabled && cc.gameObject.activeInHierarchy;
+    }
+    
     void SetEnabled(MonoBehaviour[] arr, bool on)
     {
         if (arr == null) return;
@@ -189,6 +297,29 @@ public class PlayerClimber : MonoBehaviour
             col.enabled = false;
             _disabledChainCols.Add(col);
         }
+    }
+
+    void CacheCCSettings()
+    {
+        if (!cc) return;
+        _savedStepOffset = Mathf.Max(kMinStepOffset, cc.stepOffset);
+        _savedSlopeLimit = cc.slopeLimit;
+    }
+
+    void ClimbCCSettings()
+    {
+        if (!cc) return;
+        // IMPORTANT: Set stepOffset first and keep it strictly positive
+        cc.stepOffset = kMinStepOffset; 
+        cc.slopeLimit = 90f;
+    }
+
+    void RestoreCCSettings()
+    {
+        if (!cc) return;
+        // Restore slope first, then step offset
+        cc.slopeLimit = _savedSlopeLimit;
+        cc.stepOffset = Mathf.Max(kMinStepOffset, _savedStepOffset);
     }
 
     void OnDrawGizmos()

@@ -246,6 +246,8 @@ MonoBehaviour:
   autoDisableChildColliders: 1
   standClearFramesRequired: 2
   standCheckBuffer: 0.02
+  footsteps: {fileID: 4510404408140810128}
+  climber: {fileID: 0}
 --- !u!54 &9203006501987458209
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -268,8 +270,8 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -286,7 +288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
   cam: {fileID: 4438911949873305345}
-  interactDistance: 3
+  interactDistance: 2
   interactRadius: 0.2
   interactMask:
     serializedVersion: 2
@@ -322,10 +324,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerClimber
   cc: {fileID: 3558684702706341386}
   rb: {fileID: 9203006501987458209}
-  disableWhileClimbing: []
+  disableWhileClimbing:
+  - {fileID: 2069055084509252345}
   climbSpeed: 3.5
   detachKey: 32
   lateralOffset: 0.35
+  inputDeadzone: 0.05
+  clingGraceTime: 3
   debugDraw: 0
   moveY:
     m_Name: Move Y
@@ -336,6 +341,293 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
+--- !u!1 &4679251673996364980
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6328106991521297223}
+  - component: {fileID: 3615998282314604698}
+  - component: {fileID: 6728224117690622984}
+  - component: {fileID: 4510404408140810128}
+  m_Layer: 0
+  m_Name: FootAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6328106991521297223
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4679251673996364980}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 354127382296684684}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3615998282314604698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4679251673996364980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76776dcdafd2ad941b5c474128fe9634, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SurfaceProbe
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  rayLength: 1.5
+  rayOriginOffset: {x: 0, y: 0.05, z: 0}
+  defaultSurface: Concrete
+--- !u!82 &6728224117690622984
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4679251673996364980}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &4510404408140810128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4679251673996364980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7356a2788d9b40f41a33d4316ab07963, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FootstepSimple
+  feet: {fileID: 354127382296684684}
+  probe: {fileID: 3615998282314604698}
+  moveSpeed: 0
+  isRunning: 0
+  isCrouching: 0
+  verticalSpeed: 0
+  isGrounded: 0
+  isClimbing: 0
+  climbInterval: 0.33
+  climbSpeedScale: 0.5
+  climbPitchMult: 1
+  stepDistanceWalk: 3
+  sprintStepMult: 0.8
+  crouchStepMult: 1.35
+  minSpeedForSteps: 0.8
+  minStepInterval: 0.18
+  useSpeedForSteps: 1
+  speedSmoothing: 12
+  pitchRange: {x: 0.85, y: 0.9}
+  sprintPitchMult: 1.06
+  crouchPitchMult: 0.94
+  landHeavySpeed: -9
+  minLandInterval: 0.25
+  volume: 0.2
+  surfaces:
+  - surfaceId: Cave
+    walk:
+    - {fileID: 8300000, guid: 95419d4015957164b8b3ee95157f78d4, type: 3}
+    - {fileID: 8300000, guid: e4ad0787f454099479d119889e666503, type: 3}
+    - {fileID: 8300000, guid: 0376a56316e068c4b8112d81951c45c2, type: 3}
+    - {fileID: 8300000, guid: 3cba9678929eeb243bcb5dc2459619f7, type: 3}
+    - {fileID: 8300000, guid: 190ac7b119fe4e24e969d7ecce479f08, type: 3}
+    - {fileID: 8300000, guid: 3d7c352503a23d9438d578f6abc3ee39, type: 3}
+    - {fileID: 8300000, guid: b03ba7c86cdb59a42baaa3c39c76a005, type: 3}
+    - {fileID: 8300000, guid: a2010a2e3088b5d4ea2604f8b91cab27, type: 3}
+    - {fileID: 8300000, guid: dd6adc738b7dbbf4b8e2573157dfec20, type: 3}
+    - {fileID: 8300000, guid: ce397021f53004d4a99087a323e56100, type: 3}
+    - {fileID: 8300000, guid: acdb98001e91d204c8372ef334bac2b9, type: 3}
+    - {fileID: 8300000, guid: 570bb51bb40055841bcf1c3462683a68, type: 3}
+    - {fileID: 8300000, guid: f615b1e3a18fd4041a947105f76aa5e4, type: 3}
+    - {fileID: 8300000, guid: 303d326fe3731424ba13003910e8640c, type: 3}
+    - {fileID: 8300000, guid: 0e51c665ea64dc34db1d6b3a08106328, type: 3}
+    - {fileID: 8300000, guid: d988ae07889eb3843a4a2bd7813afb05, type: 3}
+    - {fileID: 8300000, guid: 81048321795035f428375de6628247c2, type: 3}
+    run: []
+    crouch: []
+    landLight: []
+    landHeavy: []
+    climb: []
+  - surfaceId: Forest Ground
+    walk:
+    - {fileID: 8300000, guid: 6b7289aa838857545bc9a1f36aa87046, type: 3}
+    - {fileID: 8300000, guid: 725abc9443dff63409ff2835a5372323, type: 3}
+    - {fileID: 8300000, guid: 31ca0e8fe3481ef46b155340bae9b1c9, type: 3}
+    - {fileID: 8300000, guid: fd249a2ba7530f24a9025d542703a00d, type: 3}
+    - {fileID: 8300000, guid: 0b6969133e659df4eb6c99d6adc8250f, type: 3}
+    - {fileID: 8300000, guid: 2e050449529877f46ab507486c74a420, type: 3}
+    - {fileID: 8300000, guid: df38fa45b97a20f40b3b50fb48a0c4c0, type: 3}
+    - {fileID: 8300000, guid: 249ba9b739f309046b2dc4172c42fbf5, type: 3}
+    - {fileID: 8300000, guid: 7376c5b4a22c24e49b5173a76a79569d, type: 3}
+    run: []
+    crouch: []
+    landLight: []
+    landHeavy: []
+    climb: []
+  - surfaceId: Forest Dirt
+    walk:
+    - {fileID: 8300000, guid: efcbcf51d1af291418b18af3aa53415b, type: 3}
+    - {fileID: 8300000, guid: 76cd2d724e7f7aa4c9692d8719d0f6aa, type: 3}
+    - {fileID: 8300000, guid: a4f5a59eb3ef8a34fb9da48a587f80bf, type: 3}
+    - {fileID: 8300000, guid: 26cd72472fb2bd244ac127c0bdc9a4a9, type: 3}
+    - {fileID: 8300000, guid: cba515956b1446a4785728c1dcdb5c2a, type: 3}
+    - {fileID: 8300000, guid: a1fa2bbbf0ec28c4e95f689300a2c9f4, type: 3}
+    - {fileID: 8300000, guid: e83abd2fd6c1d7740a1f188885f7d7a7, type: 3}
+    - {fileID: 8300000, guid: cc834e03c64e5c640aef2637f60ac929, type: 3}
+    - {fileID: 8300000, guid: bfca18a7da2655b49aec813395697e1c, type: 3}
+    - {fileID: 8300000, guid: 7e6b85d6be69712498bffc606d2755a3, type: 3}
+    run: []
+    crouch: []
+    landLight: []
+    landHeavy: []
+    climb: []
+  - surfaceId: Wood
+    walk:
+    - {fileID: 8300000, guid: cb400141f68c9dc49afa4a7bf9f6e677, type: 3}
+    - {fileID: 8300000, guid: 203d62811813d8d4eaad83026b789823, type: 3}
+    - {fileID: 8300000, guid: cb2dc76ef633c244c855e0c0ba9e4183, type: 3}
+    - {fileID: 8300000, guid: 4e4080118721b954bb460fef649f1dc6, type: 3}
+    - {fileID: 8300000, guid: e4dccc589afd5b34c8dd03c1b41a3561, type: 3}
+    - {fileID: 8300000, guid: c59028037a7d21a4c85ec603b0065510, type: 3}
+    - {fileID: 8300000, guid: dd9623460c7962e4abc7c0df4fcff8f1, type: 3}
+    - {fileID: 8300000, guid: 912f5c3291a97a94e8887724a1efe9ac, type: 3}
+    - {fileID: 8300000, guid: 8067274589417204dbc6a5f10a5d05fa, type: 3}
+    run: []
+    crouch: []
+    landLight: []
+    landHeavy: []
+    climb: []
+  - surfaceId: Stone
+    walk:
+    - {fileID: 8300000, guid: 89100a927ce6e184b97ee586c202fa5b, type: 3}
+    - {fileID: 8300000, guid: 203d62811813d8d4eaad83026b789823, type: 3}
+    - {fileID: 8300000, guid: cb2dc76ef633c244c855e0c0ba9e4183, type: 3}
+    - {fileID: 8300000, guid: 4e4080118721b954bb460fef649f1dc6, type: 3}
+    - {fileID: 8300000, guid: e4dccc589afd5b34c8dd03c1b41a3561, type: 3}
+    - {fileID: 8300000, guid: c59028037a7d21a4c85ec603b0065510, type: 3}
+    - {fileID: 8300000, guid: dd9623460c7962e4abc7c0df4fcff8f1, type: 3}
+    - {fileID: 8300000, guid: 912f5c3291a97a94e8887724a1efe9ac, type: 3}
+    - {fileID: 8300000, guid: 8067274589417204dbc6a5f10a5d05fa, type: 3}
+    run: []
+    crouch: []
+    landLight: []
+    landHeavy: []
+    climb: []
+  - surfaceId: Chain
+    walk:
+    - {fileID: 8300000, guid: 371c247ce2ecdc1478f8aed0392c66e3, type: 3}
+    run: []
+    crouch: []
+    landLight: []
+    landHeavy: []
+    climb: []
+  debug: 0
+  minAirTime: 0.08
+  groundedSettleTime: 0.03
+  sourceChildName: FootAudio
 --- !u!1 &4763656986374264434
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,7 +659,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.37, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 354127382296684684}
   m_Father: {fileID: 4426351618526396816}
   m_LocalEulerAnglesHint: {x: 0, y: -188.862, z: 0}
 --- !u!33 &7761463071092149320
@@ -598,6 +891,38 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &6670255970836753097
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 354127382296684684}
+  m_Layer: 0
+  m_Name: Feet
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &354127382296684684
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6670255970836753097}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.737, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6328106991521297223}
+  m_Father: {fileID: 791886263634799158}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7004213986054460308
 GameObject:
   m_ObjectHideFlags: 0

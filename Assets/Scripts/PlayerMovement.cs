@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 [RequireComponent(typeof(CharacterController))]
+[DefaultExecutionOrder(0)] // runs after PlayerClimber
 public class FPPlayer : MonoBehaviour
 {
     [Header("Movement")]
@@ -15,7 +16,7 @@ public class FPPlayer : MonoBehaviour
 
     [Header("References")]
     [SerializeField] Transform body;
-    [SerializeField] Transform cameraTransform;  
+    [SerializeField] Transform cameraTransform;
     [SerializeField] Slider staminaBar;
     [SerializeField] Image staminaFill;
     [SerializeField] CanvasGroup staminaGroup;
@@ -44,6 +45,11 @@ public class FPPlayer : MonoBehaviour
     [SerializeField] int standClearFramesRequired = 2;
     [SerializeField] float standCheckBuffer = 0.02f;
 
+    [Header("Audio / Footsteps")]
+    public FootstepSimple footsteps;
+    [SerializeField] PlayerClimber climber; // optional
+
+    // Internals
     CharacterController controller;
     Vector3 velocity;
     float stamina;
@@ -65,15 +71,21 @@ public class FPPlayer : MonoBehaviour
     int standClearFrames;
     bool initialized;
 
-    // camera-pivot (nieuw)
     Transform camPivot;
+
+    // world-space delta cache
+    Vector3 _lastWorldPos;
 
     void Awake()
     {
         controller = GetComponent<CharacterController>();
+        if (!climber)
+        {
+            climber = GetComponent<PlayerClimber>();
+            if (!climber) climber = GetComponentInChildren<PlayerClimber>(true);
+        }
         stamina = maxStamina;
 
-        // Input
         var map = new InputActionMap("Player");
         move = map.AddAction("Move");
         move.AddCompositeBinding("2DVector")
@@ -84,11 +96,14 @@ public class FPPlayer : MonoBehaviour
         sprint = map.AddAction("Sprint", binding: "<Keyboard>/leftShift");
         map.Enable();
 
-        // UI
-        if (staminaBar) { staminaBar.minValue = 0f; staminaBar.maxValue = maxStamina; staminaBar.value = maxStamina; }
+        if (staminaBar)
+        {
+            staminaBar.minValue = 0f;
+            staminaBar.maxValue = maxStamina;
+            staminaBar.value = maxStamina;
+        }
         if (body) bodyScaleStart = body.localScale;
 
-        // --- Camera pivot setup ---
         if (cameraTransform == null)
         {
             var mainCam = Camera.main;
@@ -97,19 +112,17 @@ public class FPPlayer : MonoBehaviour
         if (cameraTransform != null)
         {
             camBaseLocalY = cameraTransform.localPosition.y;
-            EnsureCameraPivot(); // maakt/zet pivot en herparent de camera
+            EnsureCameraPivot();
         }
 
         if (staminaGroup) staminaGroup.alpha = 0f;
 
-        // Capsule-cache
         standHeight = controller.height;
         standCenter = controller.center;
         crouchHeight = Mathf.Max(controller.radius * 2f + 0.05f, standHeight * controllerCrouchMultiplier);
         float deltaH = standHeight - crouchHeight;
         crouchCenter = standCenter + new Vector3(0f, -deltaH * 0.5f, 0f);
 
-        // child colliders uit
         if (autoDisableChildColliders)
         {
             childCols = GetComponentsInChildren<Collider>(true);
@@ -121,34 +134,98 @@ public class FPPlayer : MonoBehaviour
             }
         }
 
-        // eigen layer uit mask
         ceilingMask &= ~(1 << gameObject.layer);
     }
 
-    void Start() { StartCoroutine(DelayedInit()); }
+    void Start()
+    {
+        StartCoroutine(DelayedInit());
+        _lastWorldPos = transform.position;
+    }
+
     IEnumerator DelayedInit() { yield return null; initialized = true; }
+
+    bool CCReadyNow()
+    {
+        // require enabled AND activeInHierarchy, and not in snap phase
+        return controller && controller.enabled && controller.gameObject.activeInHierarchy
+               && !(climber && climber.IsSnapping);
+    }
 
     void Update()
     {
         if (!initialized) return;
 
+        // If CC is disabled or snapping this frame, skip all motion safely.
+        if (!CCReadyNow())
+        {
+            if (footsteps)
+            {
+                footsteps.moveSpeed     = 0f;
+                footsteps.verticalSpeed = 0f;
+                footsteps.isRunning     = false;
+                footsteps.isCrouching   = isCrouching;
+                footsteps.isGrounded    = true;
+                footsteps.isClimbing    = (climber && climber.IsClimbing);
+            }
+            _lastWorldPos = transform.position;
+            UpdateStaminaUI();
+            UpdateBodyAndCamera();
+            return;
+        }
+
+        bool climbingNow = (climber && climber.IsClimbing);
+
+        // Grounded query guarded
         isGrounded = controller.isGrounded;
         if (isGrounded && velocity.y < 0f) velocity.y = -2f;
 
+        // Input + state
         Vector2 input = move.ReadValue<Vector2>();
         Vector3 moveDir = transform.right * input.x + transform.forward * input.y;
 
         HandleCrouch();
         HandleSprint(input);
 
-        float currentSpeed = isCrouching ? crouchSpeed : (isSprinting ? sprintSpeed : walkSpeed);
-        controller.Move(moveDir * currentSpeed * Time.deltaTime);
+        // Only move/apply gravity when NOT climbing
+        if (!climbingNow)
+        {
+            float currentSpeed = isCrouching ? crouchSpeed : (isSprinting ? sprintSpeed : walkSpeed);
 
-        if (isGrounded && jump.WasPressedThisFrame() && !isCrouching)
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            // Re-check just before each Move
+            if (CCReadyNow()) controller.Move(moveDir * currentSpeed * Time.deltaTime);
 
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+            if (isGrounded && jump.WasPressedThisFrame() && !isCrouching)
+                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+            velocity.y += gravity * Time.deltaTime;
+
+            if (CCReadyNow()) controller.Move(velocity * Time.deltaTime);
+        }
+        else
+        {
+            velocity = Vector3.zero; // no gravity while climbing
+        }
+
+        // horizontal world speed from delta
+        Vector3 now = transform.position;
+        float horizDist = Vector3.ProjectOnPlane(now - _lastWorldPos, Vector3.up).magnitude;
+        float worldHorizSpeed = horizDist / Mathf.Max(Time.deltaTime, 0.0001f);
+        _lastWorldPos = now;
+
+        // feed footsteps
+        if (footsteps)
+        {
+            footsteps.isRunning     = isSprinting;
+            footsteps.isCrouching   = isCrouching;
+            footsteps.isGrounded    = isGrounded && !climbingNow;
+            footsteps.verticalSpeed = (isGrounded && !climbingNow) ? 0f : velocity.y;
+
+            footsteps.isClimbing = climbingNow;
+            footsteps.moveSpeed  = (climbingNow && climber)
+                ? climber.CurrentClimbSpeed
+                : worldHorizSpeed;
+        }
 
         UpdateStaminaUI();
         UpdateBodyAndCamera();
@@ -164,7 +241,10 @@ public class FPPlayer : MonoBehaviour
             if (StandSpaceBlocked()) { wantsToCrouch = true; standClearFrames = 0; }
             else { standClearFrames++; if (standClearFrames < standClearFramesRequired) wantsToCrouch = true; }
         }
-        else standClearFrames = 0;
+        else
+        {
+            standClearFrames = 0;
+        }
 
         isCrouching = wantsToCrouch;
     }
@@ -182,15 +262,14 @@ public class FPPlayer : MonoBehaviour
 
     void UpdateBodyAndCamera()
     {
-        // Visual body scale
         if (body)
         {
             float targetY = isCrouching ? bodyCrouchScaleY : 1f;
-            Vector3 s = body.localScale; s.y = Mathf.Lerp(s.y, targetY, Time.deltaTime * scaleLerpSpeed);
+            Vector3 s = body.localScale;
+            s.y = Mathf.Lerp(s.y, targetY, Time.deltaTime * scaleLerpSpeed);
             body.localScale = s;
         }
 
-        // Camera: verplaats de PIVOT in Y; camera zelf doet head-bob daarbovenop
         if (camPivot != null)
         {
             float goal = (isCrouching ? camCrouchOffset : 0f);
@@ -200,7 +279,6 @@ public class FPPlayer : MonoBehaviour
         }
         else if (cameraTransform != null)
         {
-            // fallback (mocht pivot niet bestaan)
             Vector3 p = cameraTransform.localPosition;
             float goalY = camBaseLocalY + (isCrouching ? camCrouchOffset : 0f);
             p.y = Mathf.Lerp(p.y, goalY, Time.deltaTime * camLerpSpeed);
@@ -210,6 +288,8 @@ public class FPPlayer : MonoBehaviour
 
     void UpdateControllerCapsule()
     {
+        if (!CCReadyNow()) return;
+
         bool forceCrouchTargets = isCrouching || StandSpaceBlocked();
         float targetHeight = forceCrouchTargets ? crouchHeight : standHeight;
         Vector3 targetCenter = forceCrouchTargets ? crouchCenter : standCenter;
@@ -233,9 +313,12 @@ public class FPPlayer : MonoBehaviour
     void UpdateStaminaUI()
     {
         if (!staminaBar) return;
+
         float target = Mathf.Clamp(stamina, 0f, maxStamina);
         staminaBar.value = Mathf.MoveTowards(staminaBar.value, target, Time.deltaTime * staminaUISpeed * maxStamina);
+
         if (staminaFill) staminaFill.enabled = staminaBar.value > 0.001f;
+
         if (staminaGroup)
         {
             bool show = stamina < maxStamina - 0.01f;
@@ -247,28 +330,32 @@ public class FPPlayer : MonoBehaviour
     public bool IsCrouching => isCrouching;
     public bool IsSprinting => isSprinting;
 
-    // ---------- helpers ----------
     void EnsureCameraPivot()
     {
-        // Als camera al een parent heeft dat niet de Player is, laat zo.
-        // Anders maken we een pivot onder de Player en hangen daar de camera in.
         if (cameraTransform == null) return;
 
         if (cameraTransform.parent == null || cameraTransform.parent == transform)
         {
-            // Maak/zoek pivot als direct child "CameraPivot"
             var existing = transform.Find("CameraPivot");
             camPivot = existing != null ? existing : new GameObject("CameraPivot").transform;
             camPivot.SetParent(transform, false);
             camPivot.localPosition = Vector3.zero;
             camPivot.localRotation = Quaternion.identity;
-
-            // Herparent camera onder pivot en behoud lokale offset
             cameraTransform.SetParent(camPivot, true);
         }
         else
         {
             camPivot = cameraTransform.parent;
+        }
+    }
+
+    public void SyncSpeedAfterTeleport()
+    {
+        _lastWorldPos = transform.position;
+        if (footsteps)
+        {
+            footsteps.moveSpeed = 0f;
+            footsteps.verticalSpeed = 0f;
         }
     }
 }

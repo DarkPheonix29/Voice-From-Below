@@ -6,8 +6,9 @@ using UnityEngine;
 /// Scene-level light controller that:
 ///  - Flickers only lights tagged "LampLight"
 ///  - For Level 3: can be told (by cutscene) to kill lights permanently and remember that
+///  - Plays ambience: steady hum during HOLD, flicker/buzz during FLICKER, with crossfades
 /// </summary>
-public class LightFlickerManager : MonoBehaviour
+public class LightFlicker : MonoBehaviour
 {
     public enum SceneBehavior
     {
@@ -35,20 +36,54 @@ public class LightFlickerManager : MonoBehaviour
     [Header("Persistence (Level 3 only)")]
     public string level3LightsDeadFlag = "L3_LightsDead";
 
+    // -------- AUDIO --------
+    [Header("Audio (Ambience)")]
+    [Tooltip("Loop that plays during HOLD (lights stable)")]
+    public AudioClip steadyLoop;
+    [Tooltip("Loop that plays during FLICKER")]
+    public AudioClip flickerLoop;
+
+    [Tooltip("AudioSource for steady loop (will be auto-created if null)")]
+    public AudioSource steadySource;
+    [Tooltip("AudioSource for flicker loop (will be auto-created if null)")]
+    public AudioSource flickerSource;
+
+    [Range(0f, 1f)] public float steadyVolume = 0.6f;
+    [Range(0f, 1f)] public float flickerVolume = 0.7f;
+    [Tooltip("Seconds for crossfades between steady and flicker")]
+    public float crossfadeTime = 0.25f;
+
+    [Header("Audio Spatialization")]
+    [Range(0f, 1f)]
+    [Tooltip("0 = 2D (global), 1 = 3D (attenuates with distance). For ambient room tone, 0 is typical.")]
+    public float spatialBlend = 0f;
+
+    [Header("Audio Polish")]
+    [Tooltip("Random pitch range applied to the FLICKER source on each step")]
+    public Vector2 flickerPitchRange = new Vector2(0.96f, 1.04f);
+    [Tooltip("Random volume wobble applied to flicker each step (0 = none)")]
+    [Range(0f, 0.2f)] public float flickerVolumeWobble = 0.05f;
+
     // Internals
     private readonly List<Light> lights = new List<Light>();
     private readonly Dictionary<Light, float> originalIntensity = new Dictionary<Light, float>();
     private Coroutine cycleRoutine;
+    private Coroutine crossfadeRoutine;
 
     void Awake()
     {
         BuildLightList();
+        EnsureAudioSources();
     }
 
     void Start()
     {
         // If behavior is disabled, do nothing.
-        if (behavior == SceneBehavior.Disabled) return;
+        if (behavior == SceneBehavior.Disabled)
+        {
+            StopAllAudio();
+            return;
+        }
 
         // If this is Level 3 behavior and the flag is already set, kill lights immediately and stop.
         if (behavior == SceneBehavior.Level3WithShutdown && SaveFlags.Instance && SaveFlags.Instance.Has(level3LightsDeadFlag))
@@ -64,6 +99,7 @@ public class LightFlickerManager : MonoBehaviour
     void OnDestroy()
     {
         if (cycleRoutine != null) StopCoroutine(cycleRoutine);
+        if (crossfadeRoutine != null) StopCoroutine(crossfadeRoutine);
     }
 
     private void BuildLightList()
@@ -93,16 +129,18 @@ public class LightFlickerManager : MonoBehaviour
     {
         while (true)
         {
-            // HOLD: restore original intensity
+            // HOLD: restore original intensity, play steady ambience
             foreach (var l in lights)
             {
                 if (!l) continue;
                 if (originalIntensity.TryGetValue(l, out var orig))
                     l.intensity = orig;
             }
+            PlaySteady();
             yield return new WaitForSeconds(holdDuration);
 
-            // FLICKER: randomize intensity for a short burst
+            // FLICKER: randomize intensity for a short burst, play flicker ambience
+            PlayFlicker();
             float t0 = Time.time;
             while (Time.time < t0 + flickerDuration)
             {
@@ -114,6 +152,15 @@ public class LightFlickerManager : MonoBehaviour
                     float minI = maxI * minIntensityFactor;
                     l.intensity = Random.Range(minI, maxI);
                 }
+
+                // Small audio liveliness during flicker
+                if (flickerSource != null)
+                {
+                    flickerSource.pitch = Random.Range(flickerPitchRange.x, flickerPitchRange.y);
+                    var targetVol = Mathf.Clamp01(flickerVolume + Random.Range(-flickerVolumeWobble, flickerVolumeWobble));
+                    SetVolumeInstant(flickerSource, targetVol);
+                }
+
                 yield return new WaitForSeconds(flickerRate);
             }
         }
@@ -148,7 +195,123 @@ public class LightFlickerManager : MonoBehaviour
             l.enabled = false; // ensure totally off
         }
 
+        StopAllAudio();
+
         // No further control needed—disable this component.
         enabled = false;
+    }
+
+    // ---------- AUDIO HELPERS ----------
+
+    private void EnsureAudioSources()
+    {
+        if (steadySource == null)
+        {
+            steadySource = gameObject.AddComponent<AudioSource>();
+            steadySource.playOnAwake = false;
+            steadySource.loop = true;
+        }
+        if (flickerSource == null)
+        {
+            flickerSource = gameObject.AddComponent<AudioSource>();
+            flickerSource.playOnAwake = false;
+            flickerSource.loop = true;
+        }
+
+        steadySource.clip = steadyLoop;
+        steadySource.spatialBlend = spatialBlend;
+        steadySource.volume = 0f;
+
+        flickerSource.clip = flickerLoop;
+        flickerSource.spatialBlend = spatialBlend;
+        flickerSource.volume = 0f;
+    }
+
+    private void PlaySteady()
+    {
+        if (!steadySource) return;
+
+        if (steadySource.clip && !steadySource.isPlaying) steadySource.Play();
+        if (flickerSource && flickerSource.isPlaying && crossfadeTime > 0f)
+            StartCrossfade(flickerSource, 0f, steadySource, steadyVolume, crossfadeTime);
+        else
+        {
+            SetVolumeInstant(flickerSource, 0f);
+            SetVolumeInstant(steadySource, steadyVolume);
+        }
+    }
+
+    private void PlayFlicker()
+    {
+        if (!flickerSource) return;
+
+        if (flickerSource.clip && !flickerSource.isPlaying) flickerSource.Play();
+        if (steadySource && steadySource.isPlaying && crossfadeTime > 0f)
+            StartCrossfade(steadySource, 0f, flickerSource, flickerVolume, crossfadeTime);
+        else
+        {
+            SetVolumeInstant(steadySource, 0f);
+            SetVolumeInstant(flickerSource, flickerVolume);
+        }
+    }
+
+    private void StopAllAudio()
+    {
+        if (crossfadeRoutine != null)
+        {
+            StopCoroutine(crossfadeRoutine);
+            crossfadeRoutine = null;
+        }
+        if (steadySource)
+        {
+            steadySource.volume = 0f;
+            steadySource.Stop();
+        }
+        if (flickerSource)
+        {
+            flickerSource.volume = 0f;
+            flickerSource.Stop();
+        }
+    }
+
+    private void SetVolumeInstant(AudioSource src, float vol)
+    {
+        if (!src) return;
+        src.volume = Mathf.Clamp01(vol);
+        if (src.volume > 0f && !src.isPlaying && src.clip) src.Play();
+        if (src.volume == 0f && src.isPlaying && crossfadeTime <= 0f) src.Stop();
+    }
+
+    private void StartCrossfade(AudioSource from, float fromTarget, AudioSource to, float toTarget, float time)
+    {
+        if (crossfadeRoutine != null) StopCoroutine(crossfadeRoutine);
+        crossfadeRoutine = StartCoroutine(CrossfadeCo(from, fromTarget, to, toTarget, time));
+    }
+
+    private IEnumerator CrossfadeCo(AudioSource from, float fromTarget, AudioSource to, float toTarget, float time)
+    {
+        float t = 0f;
+        float startFrom = from ? from.volume : 0f;
+        float startTo = to ? to.volume : 0f;
+
+        if (to && to.clip && !to.isPlaying) to.Play();
+
+        while (t < time)
+        {
+            t += Time.deltaTime;
+            float k = Mathf.Clamp01(t / time);
+            if (from) from.volume = Mathf.Lerp(startFrom, Mathf.Clamp01(fromTarget), k);
+            if (to)   to.volume   = Mathf.Lerp(startTo,   Mathf.Clamp01(toTarget),   k);
+            yield return null;
+        }
+
+        if (from)
+        {
+            from.volume = Mathf.Clamp01(fromTarget);
+            if (from.volume <= 0f) from.Stop();
+        }
+        if (to) to.volume = Mathf.Clamp01(toTarget);
+
+        crossfadeRoutine = null;
     }
 }
