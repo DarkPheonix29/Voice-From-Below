@@ -341,6 +341,171 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2763921481354444034, guid: 9480407949b1e0b43bef93cbdebe6c0e, type: 3}
   m_PrefabInstance: {fileID: 58513143}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &74590062
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 74590063}
+  - component: {fileID: 74590065}
+  - component: {fileID: 74590064}
+  m_Layer: 0
+  m_Name: Mine Entrance
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &74590063
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74590062}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 57.78, y: 0.56, z: -401.35}
+  m_LocalScale: {x: 4.6843, y: 7.8211, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1526796076}
+  m_Father: {fileID: 1497820635}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &74590064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74590062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10326ff1662c8b0479b884d5754ed44c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceLineTrigger
+  triggerId: Mine Entrance (Level 1)
+  lines:
+  - clip: {fileID: 8300000, guid: 47b29f494e408104c95b4ba5eda33d00, type: 3}
+    subtitle: <i>Don't go in..</i> Who's there? Shit. Dad, I'm on my way!
+    preDelay: 0
+    extraHold: 0
+    interruptible: 0
+    objectiveOverride: Go inside
+    overrideSource: {fileID: 0}
+  oneShot: 1
+  objectiveOnTrigger: 
+  barrierPlane: {fileID: 1526796075}
+  activateBarrierOnEnter: 0
+  disableAfterFire: 1
+  disableComponentAfterFire: 1
+  deactivateObjectAfterFire: 1
+--- !u!65 &74590065
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74590062}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &87411815
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 87411816}
+  - component: {fileID: 87411818}
+  - component: {fileID: 87411817}
+  m_Layer: 0
+  m_Name: Crouch Under Tree
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &87411816
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 87411815}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.06240028, y: -0.0023370099, z: -0.033814352, w: 0.9974755}
+  m_LocalPosition: {x: 88.29, y: 28.63, z: -125.56}
+  m_LocalScale: {x: 1, y: 5.1871, z: 28.483}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1497820635}
+  m_LocalEulerAnglesHint: {x: -7.16, y: -0.026, z: -3.882}
+--- !u!114 &87411817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 87411815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10326ff1662c8b0479b884d5754ed44c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceLineTrigger
+  triggerId: Crouch Under Tree
+  lines:
+  - clip: {fileID: 8300000, guid: a2269ed1072b0a04f8cfa1a42e54f504, type: 3}
+    subtitle: Hmm.. Guess I need to go underneath.
+    preDelay: 0
+    extraHold: 0
+    interruptible: 0
+    objectiveOverride: 
+    overrideSource: {fileID: 0}
+  oneShot: 1
+  objectiveOnTrigger: 
+  barrierPlane: {fileID: 0}
+  activateBarrierOnEnter: 0
+  disableAfterFire: 1
+  disableComponentAfterFire: 1
+  deactivateObjectAfterFire: 0
+--- !u!65 &87411818
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 87411815}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &100607308
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1902,6 +2067,77 @@ Transform:
   - {fileID: 1777696193}
   - {fileID: 58513144}
   - {fileID: 1597990907}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &535446901
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 535446904}
+  - component: {fileID: 535446903}
+  - component: {fileID: 535446902}
+  m_Layer: 0
+  m_Name: ActFiveStartTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &535446902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535446901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99dd1de5a1139fd4bac809efa214a653, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActFiveStartTrigger
+  firstNodeId: L5_Start
+  triggerFlag: L5_Chase_StartTrigger
+  oneShot: 1
+  barrierPlane: {fileID: 0}
+  activateBarrierOnEnter: 1
+--- !u!65 &535446903
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535446901}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &535446904
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535446901}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 432.21, y: 7.46, z: 578.4729}
+  m_LocalScale: {x: 1, y: 6.6592, z: 12.149}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &561629843
@@ -3568,6 +3804,60 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SurfaceIdOverride
   surfaceId: Rocks
+--- !u!1 &1134557384
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1134557386}
+  - component: {fileID: 1134557385}
+  m_Layer: 0
+  m_Name: SceneChaseAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1134557385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1134557384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c68c3f903bc25e4eb59f4c4e9d51310, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneChaseAnchor
+  nodeId: L5_Start
+  segment: {fileID: 0}
+  killLightsOnComplete: 0
+  level3LightFlicker: {fileID: 0}
+  nextScene: Level 4 Cave
+  nextNodeId: L4_Middle
+  nextSpawnId: Level4_BackFrom5
+  isFinalNode: 0
+  barrierPlane: {fileID: 0}
+  activateBarrierOnPlay: 1
+--- !u!4 &1134557386
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1134557384}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 442.00668, y: 4.14507, z: 577.086}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1142575981
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4249,6 +4539,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1403221080}
+  - component: {fileID: 1403221082}
+  - component: {fileID: 1403221081}
   m_Layer: 0
   m_Name: Dynamite
   m_TagString: Untagged
@@ -4274,6 +4566,124 @@ Transform:
   - {fileID: 445943886}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1403221081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403221079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a339cc6efbcc9f4dae407a802309a78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DynamitePickup
+  pickupId: L5_Dyn_01
+  sfx: {fileID: 0}
+--- !u!65 &1403221082
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403221079}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.51320404, y: 0.26649794, z: 0.5}
+  m_Center: {x: -0.30353805, y: -0.11675104, z: 0}
+--- !u!1 &1444864957
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1444864958}
+  - component: {fileID: 1444864960}
+  - component: {fileID: 1444864959}
+  m_Layer: 0
+  m_Name: OffMountain
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1444864958
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1444864957}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.20749864, z: -0, w: 0.97823536}
+  m_LocalPosition: {x: 1.08, y: 6.46, z: 0.22}
+  m_LocalScale: {x: 1, y: 16.456532, z: 48.365704}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1497820635}
+  m_LocalEulerAnglesHint: {x: 0, y: 23.952, z: 0}
+--- !u!114 &1444864959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1444864957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10326ff1662c8b0479b884d5754ed44c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceLineTrigger
+  triggerId: OffMountain
+  lines:
+  - clip: {fileID: 8300000, guid: 84f6445c2a452ed47836e49fa2e0e5b5, type: 3}
+    subtitle: That's off the mountain.. I don't have time for this, I need to find
+      my dad
+    preDelay: 0
+    extraHold: 0
+    interruptible: 0
+    objectiveOverride: 
+    overrideSource: {fileID: 0}
+  oneShot: 1
+  objectiveOnTrigger: 
+  barrierPlane: {fileID: 0}
+  activateBarrierOnEnter: 0
+  disableAfterFire: 1
+  disableComponentAfterFire: 1
+  deactivateObjectAfterFire: 1
+--- !u!65 &1444864960
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1444864957}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1444966018
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4461,6 +4871,153 @@ Transform:
   - {fileID: 115063835}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1497820634
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1497820635}
+  m_Layer: 0
+  m_Name: VoiceLineTriggers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1497820635
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1497820634}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 370.42743, y: 0.00001, z: 615.1418}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1444864958}
+  - {fileID: 87411816}
+  - {fileID: 1802753263}
+  - {fileID: 74590063}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1526796075
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1526796076}
+  - component: {fileID: 1526796079}
+  - component: {fileID: 1526796078}
+  - component: {fileID: 1526796077}
+  m_Layer: 0
+  m_Name: Plane (24)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1526796076
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1526796075}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.48367554, y: -0.48367554, z: -0.5158081, w: -0.5158081}
+  m_LocalPosition: {x: 0.036, y: 0.232, z: -2.87}
+  m_LocalScale: {x: 0.12339628, y: 9.899321, z: 0.22327982}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 74590063}
+  m_LocalEulerAnglesHint: {x: 0, y: 446.31702, z: 90}
+--- !u!64 &1526796077
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1526796075}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1526796078
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1526796075}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 12c1c19781297fe42aaf47e0b21530d5, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1526796079
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1526796075}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1531601271
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5525,6 +6082,88 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d68b69e187dbcf04bab91744137fc803, type: 3}
   m_PrefabInstance: {fileID: 1797784675}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1802753262
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1802753263}
+  - component: {fileID: 1802753265}
+  - component: {fileID: 1802753264}
+  m_Layer: 0
+  m_Name: Sprint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1802753263
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802753262}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.027503442, y: 0.65085787, z: -0.03393111, w: 0.75794214}
+  m_LocalPosition: {x: 26.97, y: 35.94, z: -270.97}
+  m_LocalScale: {x: 1, y: 39.9479, z: 63.251694}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1497820635}
+  m_LocalEulerAnglesHint: {x: 0.142, y: 81.3, z: -5.005}
+--- !u!114 &1802753264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802753262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10326ff1662c8b0479b884d5754ed44c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceLineTrigger
+  triggerId: Sprint
+  lines:
+  - clip: {fileID: 8300000, guid: df93135e73b96d4449954f91b5cf8754, type: 3}
+    subtitle: The air is thick. Smells burnt. Just like he said.
+    preDelay: 0
+    extraHold: 0
+    interruptible: 0
+    objectiveOverride: 
+    overrideSource: {fileID: 0}
+  oneShot: 1
+  objectiveOnTrigger: 
+  barrierPlane: {fileID: 0}
+  activateBarrierOnEnter: 0
+  disableAfterFire: 1
+  disableComponentAfterFire: 1
+  deactivateObjectAfterFire: 0
+--- !u!65 &1802753265
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802753262}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1803995964
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5857,6 +6496,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SurfaceIdOverride
   surfaceId: Rocks
+--- !u!82 &1862908038 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 950094440582740388, guid: a266d620e3a3a694db861659068bbe06, type: 3}
+  m_PrefabInstance: {fileID: 1454881950}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1865628404
 GameObject:
   m_ObjectHideFlags: 0
@@ -6456,6 +7100,65 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SurfaceIdOverride
   surfaceId: Rocks
+--- !u!1 &1954608931
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1954608933}
+  - component: {fileID: 1954608932}
+  m_Layer: 0
+  m_Name: ActFiveChaseDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1954608932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1954608931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43f6cad1d36f1ba4ca0144460a158c03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActFiveChaseDirector
+  chaseStartedFlag: L5_Chase_Started
+  chaseFinishedFlag: L5_Chase_Finished
+  introVoDoneFlag: L5_IntroVO_Done
+  introSource: {fileID: 1862908038}
+  introClip: {fileID: 8300000, guid: 6b4e9af71eb3a5042b1bb61752e2405c, type: 3}
+  introSubtitle: <i>[You]</i> Dad? Dad?? Are you here.
+  introExtraHold: 0.6
+  requiredDynamite: 3
+  requireQteSuccessForGoodEnding: 1
+  goodEndingScene: Level1_EndGood
+  badEndingScene: Level1_EndBad
+  fadeOut: 0.8
+  fadeIn: 1.2
+  goodSpawnId: FromChase_Good
+  badSpawnId: FromChase_Bad
+--- !u!4 &1954608933
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1954608931}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 367.51608, y: 4.0345, z: 578.4729}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1959423773
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6707,3 +7410,7 @@ SceneRoots:
   - {fileID: 622209954}
   - {fileID: 662274391}
   - {fileID: 679527237}
+  - {fileID: 1497820635}
+  - {fileID: 1954608933}
+  - {fileID: 535446904}
+  - {fileID: 1134557386}

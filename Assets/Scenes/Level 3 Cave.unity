@@ -5688,6 +5688,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a266d620e3a3a694db861659068bbe06, type: 3}
+--- !u!82 &318122792 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 950094440582740388, guid: a266d620e3a3a694db861659068bbe06, type: 3}
+  m_PrefabInstance: {fileID: 318122791}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &323441859
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12459,6 +12464,89 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3380235908727436649, guid: 0888c9f151be5b9499b22b2bcdd7d20a, type: 3}
   m_PrefabInstance: {fileID: 667759970}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &673837665
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 673837666}
+  - component: {fileID: 673837668}
+  - component: {fileID: 673837667}
+  m_Layer: 0
+  m_Name: LockedDoor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &673837666
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 673837665}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.20749864, z: -0, w: 0.97823536}
+  m_LocalPosition: {x: 161.342, y: 2.39, z: -57.238}
+  m_LocalScale: {x: 1, y: 4.5112286, z: 3.1609998}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1485004159}
+  m_LocalEulerAnglesHint: {x: 0, y: 23.952, z: 0}
+--- !u!114 &673837667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 673837665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10326ff1662c8b0479b884d5754ed44c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceLineTrigger
+  triggerId: Locked Door
+  lines:
+  - clip: {fileID: 8300000, guid: 22652894b89b9094ea8848e6bfadae18, type: 3}
+    subtitle: <i>[You]</i> The door seems locked. There must be a key around here
+      somewhere.
+    preDelay: 0
+    extraHold: 0
+    interruptible: 0
+    objectiveOverride: 
+    overrideSource: {fileID: 0}
+  oneShot: 1
+  objectiveOnTrigger: 
+  barrierPlane: {fileID: 0}
+  activateBarrierOnEnter: 0
+  disableAfterFire: 1
+  disableComponentAfterFire: 1
+  deactivateObjectAfterFire: 1
+--- !u!65 &673837668
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 673837665}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &677629013
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15896,6 +15984,82 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5271391431140986986, guid: 7d42b3ff7c1952445905adf283a4e3b7, type: 3}
   m_PrefabInstance: {fileID: 2136095378}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &822591246
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 822591249}
+  - component: {fileID: 822591248}
+  - component: {fileID: 822591247}
+  m_Layer: 0
+  m_Name: ActThreeCutsceneTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &822591247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 822591246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 249c7a51b3a3bf24b8eba926f3cdfd78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Level3CutsceneTrigger
+  triggerId: L3_Cutscene_Main
+  cutscene: {fileID: 0}
+  waitForVoiceQueueBeforeStart: 1
+  lightFlicker: {fileID: 2146611005}
+  lightsDeadFlag: L3_LightsDead
+  barrierPlane: {fileID: 0}
+  activateBarrierOnEnter: 0
+  oneShot: 1
+  disableComponentAfterFire: 1
+  deactivateObjectAfterFire: 0
+--- !u!65 &822591248
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 822591246}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &822591249
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 822591246}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 524.1, y: 6.16, z: 666.3}
+  m_LocalScale: {x: 73.16664, y: 14.639, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &827350028
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18880,6 +19044,58 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9144823741674066160, guid: 5834fad2188fd1648b19ec13190a783c, type: 3}
   m_PrefabInstance: {fileID: 954648591}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &955636624
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 955636626}
+  - component: {fileID: 955636625}
+  m_Layer: 0
+  m_Name: ActThreeDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &955636625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955636624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d32cdba7da1aa243ba9d9c2c966b03a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActThreeDirector
+  introVoDoneFlag: L3_IntroVO_Done
+  introSource: {fileID: 318122792}
+  introClip: {fileID: 8300000, guid: 83aa8f3e4b7fd5a4c924a6a5a810a3ae, type: 3}
+  introSubtitle: '<i>Keep.. Writing..</i>
+
+    <i>[You]</i> Who''s there?'
+  subtitleExtraHold: 0.6
+  objectiveAfterIntro: Find your dad
+--- !u!4 &955636626
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 955636624}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 482.5279, y: 0.76633, z: 620.7189}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &956487328
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19354,7 +19570,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5271391431140986986, guid: 7d42b3ff7c1952445905adf283a4e3b7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.22
+      value: 3.46
       objectReference: {fileID: 0}
     - target: {fileID: 5271391431140986986, guid: 7d42b3ff7c1952445905adf283a4e3b7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -26251,6 +26467,60 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5271391431140986986, guid: 7d42b3ff7c1952445905adf283a4e3b7, type: 3}
   m_PrefabInstance: {fileID: 1778543073}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1356668614
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1356668616}
+  - component: {fileID: 1356668615}
+  m_Layer: 0
+  m_Name: SceneChaseAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1356668615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1356668614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c68c3f903bc25e4eb59f4c4e9d51310, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneChaseAnchor
+  nodeId: L3_Middle
+  segment: {fileID: 0}
+  killLightsOnComplete: 0
+  level3LightFlicker: {fileID: 0}
+  nextScene: Level 2 Cave
+  nextNodeId: L2_Middle
+  nextSpawnId: Level2_BackFrom3
+  isFinalNode: 0
+  barrierPlane: {fileID: 0}
+  activateBarrierOnPlay: 1
+--- !u!4 &1356668616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1356668614}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 442.00668, y: 4.14507, z: 577.086}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1358361001 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5271391431140986986, guid: 7d42b3ff7c1952445905adf283a4e3b7, type: 3}
@@ -30052,6 +30322,39 @@ Transform:
   - {fileID: 316940982}
   - {fileID: 1849742898}
   - {fileID: 1302654373}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1485004158
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1485004159}
+  m_Layer: 0
+  m_Name: VoiceLineTriggers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1485004159
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485004158}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 370.42743, y: 0.00001, z: 615.1418}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 673837666}
+  - {fileID: 2099084550}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1485325418 stripped
@@ -40923,6 +41226,88 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1519566397420023004, guid: 72af308f26bb3b34cb13bcd56f2b5af2, type: 3}
   m_PrefabInstance: {fileID: 2096449318}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2099084549
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2099084550}
+  - component: {fileID: 2099084552}
+  - component: {fileID: 2099084551}
+  m_Layer: 0
+  m_Name: FindBoxes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2099084550
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2099084549}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.007813298, y: 0.6529721, z: 0.007000836, w: 0.7573093}
+  m_LocalPosition: {x: 149.58, y: 1.97, z: -6.61}
+  m_LocalScale: {x: 1, y: 5.1871, z: 7.804514}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1485004159}
+  m_LocalEulerAnglesHint: {x: 0.154, y: 81.539, z: 1.192}
+--- !u!114 &2099084551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2099084549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10326ff1662c8b0479b884d5754ed44c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoiceLineTrigger
+  triggerId: Find Boxes
+  lines:
+  - clip: {fileID: 8300000, guid: 334b58392f812d54794d704dfe6e0bc6, type: 3}
+    subtitle: <i>[You]</i> I can't reach. There must be something I can climb on.
+    preDelay: 0
+    extraHold: 0
+    interruptible: 0
+    objectiveOverride: 
+    overrideSource: {fileID: 0}
+  oneShot: 1
+  objectiveOnTrigger: 
+  barrierPlane: {fileID: 0}
+  activateBarrierOnEnter: 0
+  disableAfterFire: 1
+  disableComponentAfterFire: 1
+  deactivateObjectAfterFire: 0
+--- !u!65 &2099084552
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2099084549}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2102106568
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42012,3 +42397,7 @@ SceneRoots:
   - {fileID: 1151388027893827143}
   - {fileID: 1063458299}
   - {fileID: 1245010161}
+  - {fileID: 1485004159}
+  - {fileID: 955636626}
+  - {fileID: 822591249}
+  - {fileID: 1356668616}

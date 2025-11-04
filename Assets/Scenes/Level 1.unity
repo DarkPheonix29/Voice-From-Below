@@ -35,7 +35,7 @@ RenderSettings:
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
   m_ReflectionBounces: 1
-  m_ReflectionIntensity: 0.575
+  m_ReflectionIntensity: 0.494
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
   m_UseRadianceAmbientProbe: 0
@@ -819,9 +819,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VoiceLineTrigger
   triggerId: OffMountain
   lines:
-  - clip: {fileID: 8300000, guid: 43936be86268bea4e94c5a887632b24f, type: 3}
-    subtitle: That's off the mountain.. I should go to the cave. To the mine, to
-      find my dad
+  - clip: {fileID: 8300000, guid: 84f6445c2a452ed47836e49fa2e0e5b5, type: 3}
+    subtitle: <i>[You]</i> That's off the mountain.. I don't have time for this,
+      I need to find my dad
     preDelay: 0
     extraHold: 0
     interruptible: 0
@@ -4117,6 +4117,60 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 985470180}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &999508369
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 999508371}
+  - component: {fileID: 999508370}
+  m_Layer: 0
+  m_Name: SceneChaseAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &999508370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 999508369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c68c3f903bc25e4eb59f4c4e9d51310, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneChaseAnchor
+  nodeId: L1_Exit
+  segment: {fileID: 0}
+  killLightsOnComplete: 0
+  level3LightFlicker: {fileID: 0}
+  nextScene: 
+  nextNodeId: 
+  nextSpawnId: 
+  isFinalNode: 1
+  barrierPlane: {fileID: 0}
+  activateBarrierOnPlay: 1
+--- !u!4 &999508371
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 999508369}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 442.00668, y: 4.14507, z: 577.086}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1014796331
 GameObject:
   m_ObjectHideFlags: 0
@@ -4169,9 +4223,25 @@ MonoBehaviour:
     m_Flags: 0
   voiceSource: {fileID: 596639764}
   ringSource: {fileID: 252745543}
-  callClip: {fileID: 0}
-  callSubtitle: 
-  subtitleHoldAfterLine: 0.6
+  callClip: {fileID: 8300000, guid: 8a039f9c270506847a6f2efb3c4b943e, type: 3}
+  callSubtitle: '<i>[Dad]</i> Hey, kiddo. Just checking in. Looks like i''m deeper
+    in the old jokerville shaft then i thought. Shouldn''t take long.
+
+    <i>[You]</i>
+    You sure you are okay down there? That place hasn''t been touched in decades.
+
+    <i>[Dad]</i>
+    Don''t worry. These stories are just mountain myths. I''ll call again when I''m
+    heading up
+
+    <i>[Dad]</i> Wait what was that sound.
+
+
+
+
+    <i>[You]</i> Dad?
+    Dad!? Hello!? Can you hear me?!'
+  subtitleHoldAfterLine: 1.02
   objectiveAtStart: Answer the phone.
   objectiveAfterCall: Go to the mine.
   hudWaitTimeout: 2
@@ -6019,8 +6089,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VoiceLineTrigger
   triggerId: Mine Entrance (Level 1)
   lines:
-  - clip: {fileID: 8300000, guid: 299d46f572a631446b2f13e9c9f308c3, type: 3}
-    subtitle: <i>Don't go in..</i> Who's there? Shit. Dad, I'm on my way!
+  - clip: {fileID: 8300000, guid: 47b29f494e408104c95b4ba5eda33d00, type: 3}
+    subtitle: "<i>Don't go in..</i> \n<i>[You]</i> Who's there? Shit. Dad, I'm on
+      my way!"
     preDelay: 0
     extraHold: 0
     interruptible: 0
@@ -6101,8 +6172,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VoiceLineTrigger
   triggerId: Sprint
   lines:
-  - clip: {fileID: 8300000, guid: 95ee6369a5d4cd6458148e88a75bff62, type: 3}
-    subtitle: The air is thick. Smells burnt. Just like he said.
+  - clip: {fileID: 8300000, guid: df93135e73b96d4449954f91b5cf8754, type: 3}
+    subtitle: <i>[You]</i> The air is thick. Smells burnt. Just like he said.
     preDelay: 0
     extraHold: 0
     interruptible: 0
@@ -6183,8 +6254,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VoiceLineTrigger
   triggerId: Crouch Under Tree
   lines:
-  - clip: {fileID: 8300000, guid: 43936be86268bea4e94c5a887632b24f, type: 3}
-    subtitle: Hmm.. Guess underneath it is.
+  - clip: {fileID: 8300000, guid: a2269ed1072b0a04f8cfa1a42e54f504, type: 3}
+    subtitle: <i>[You]</i> Hmm.. Guess I need to go underneath.
     preDelay: 0
     extraHold: 0
     interruptible: 0
@@ -13009,3 +13080,4 @@ SceneRoots:
   - {fileID: 95234672}
   - {fileID: 1535807002}
   - {fileID: 1983671095}
+  - {fileID: 999508371}
