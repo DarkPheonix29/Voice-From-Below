@@ -23154,7 +23154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3995db52403f1ee46b6a443a33a42866, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TransferPoint
-  destinationScene: Level 1 Cave
+  destinationScene: Level 1
   destinationSpawnId: Level1_BackFrom2
   fadeOutDuration: 0.8
   fadeInDuration: 1.2
