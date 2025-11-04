@@ -595,6 +595,7 @@ MonoBehaviour:
   maxDistance: 15
   spread: 0
   muteWhileTriggerPlaysOnRadioNoise: 1
+  disableColliderWhenHidden: 1
 --- !u!1 &337144103
 GameObject:
   m_ObjectHideFlags: 0
@@ -2382,6 +2383,76 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7615501562521317204}
   m_LocalEulerAnglesHint: {x: -90, y: 270, z: 220}
+--- !u!1 &1703993337
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1703993340}
+  - component: {fileID: 1703993339}
+  - component: {fileID: 1703993338}
+  m_Layer: 0
+  m_Name: WalkieTriggerZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1703993338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1703993337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8041386cd1b18d0468e92abc1f34d0e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WalkieNoiseTrigger
+  targetWalkie: {fileID: 306773918}
+  duration: 3
+  volume: 0.8
+  clip: {fileID: 8300000, guid: efcbcf51d1af291418b18af3aa53415b, type: 3}
+--- !u!65 &1703993339
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1703993337}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3.7130933, y: 2.6688793, z: 1.0114441}
+  m_Center: {x: -0.7550614, y: 0.5721992, z: -0.48760915}
+--- !u!4 &1703993340
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1703993337}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.69902, y: 1.52296, z: 3.67}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1881054537
 GameObject:
   m_ObjectHideFlags: 0
@@ -2415,6 +2486,7 @@ MonoBehaviour:
   enemyAnimator: {fileID: 1289338275}
   agent: {fileID: 1289338276}
   player: {fileID: 1329720643}
+  turnLerpBeforeScream: 12
 --- !u!65 &1881054539
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3297,3 +3369,4 @@ SceneRoots:
   - {fileID: 1597469470}
   - {fileID: 1881054540}
   - {fileID: 759238309}
+  - {fileID: 1703993340}
