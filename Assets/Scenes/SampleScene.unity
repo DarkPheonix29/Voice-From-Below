@@ -1187,6 +1187,70 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!1 &759238307
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 759238309}
+  - component: {fileID: 759238308}
+  m_Layer: 6
+  m_Name: NavMesh
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &759238308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 759238307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: e4c7bc4375b8b6f4db1c051cc192224b, type: 2}
+  m_BuildHeightMesh: 0
+--- !u!4 &759238309
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 759238307}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.89601, y: 0.78962, z: -13.3893}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &870003183
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2034,9 +2098,9 @@ PrefabInstance:
       insertIndex: 4
       addedObject: {fileID: 306773917}
   m_SourcePrefab: {fileID: 100100000, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
---- !u!4 &1289338274 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bd810bf2b80730b41988b01982d5ddf7, type: 3}
+--- !u!1 &1289338273 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: bd810bf2b80730b41988b01982d5ddf7, type: 3}
   m_PrefabInstance: {fileID: 1597469470}
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &1289338275 stripped
@@ -2044,6 +2108,28 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: bd810bf2b80730b41988b01982d5ddf7, type: 3}
   m_PrefabInstance: {fileID: 1597469470}
   m_PrefabAsset: {fileID: 0}
+--- !u!195 &1289338276
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1289338273}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 2.8
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 720
+  m_StoppingDistance: 1
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!4 &1329720643 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4426351618526396816, guid: a266d620e3a3a694db861659068bbe06, type: 3}
@@ -2205,7 +2291,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bd810bf2b80730b41988b01982d5ddf7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.85
+      value: 0.808
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: bd810bf2b80730b41988b01982d5ddf7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2260,7 +2346,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -3321919801592875672, guid: bd810bf2b80730b41988b01982d5ddf7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 909070873}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bd810bf2b80730b41988b01982d5ddf7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1289338276}
   m_SourcePrefab: {fileID: 100100000, guid: bd810bf2b80730b41988b01982d5ddf7, type: 3}
 --- !u!1 &1604549766
 GameObject:
@@ -2323,11 +2412,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91df2c8e754af9e428c4d451dd47c485, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieTrigger
-  zombieAnimator: {fileID: 1289338275}
-  zombie: {fileID: 1289338274}
+  enemyAnimator: {fileID: 1289338275}
+  agent: {fileID: 1289338276}
   player: {fileID: 1329720643}
-  chaseSpeed: 4
-  turnLerp: 10
 --- !u!65 &1881054539
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2487,7 +2574,7 @@ GameObject:
   - component: {fileID: 2063798718}
   - component: {fileID: 2063798717}
   - component: {fileID: 2063798716}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ground (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2599,7 +2686,7 @@ GameObject:
   - component: {fileID: 2101487787}
   - component: {fileID: 2101487786}
   - component: {fileID: 2101487785}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3209,3 +3296,4 @@ SceneRoots:
   - {fileID: 743484483}
   - {fileID: 1597469470}
   - {fileID: 1881054540}
+  - {fileID: 759238309}

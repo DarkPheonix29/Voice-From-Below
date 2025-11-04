@@ -1,56 +1,71 @@
 using UnityEngine;
+using UnityEngine.AI;
 
-public class ZombieTrigger : MonoBehaviour
+public class EnemyTrigger : MonoBehaviour
 {
-    [Header("References")]
-    public Animator zombieAnimator;   // Animator op je Enemy
-    public Transform zombie;          // Root transform van je Enemy
-    public Transform player;          // Player (tag "Player")
+    [Header("Refs")]
+    public Animator enemyAnimator;
+    public NavMeshAgent agent;
+    public Transform player;
 
-    [Header("Chase Settings")]
-    public float chaseSpeed = 2.2f;   // loopsnelheid
-    public float turnLerp = 10f;      // draaivlotheid
+    [Header("Turn Settings")]
+    public float turnLerpBeforeScream = 12f; // hoe snel hij richt vóór scream (Turn/Scream)
 
-    private bool chasing;
+    private bool chasing = false;
     private static readonly int HashPlayerDetected = Animator.StringToHash("PlayerDetected");
 
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !chasing)
+        if (!chasing && other.CompareTag("Player"))
         {
             chasing = true;
-            // Start animatie-flow: Idle -> Turn -> (Scream?) -> Run
-            zombieAnimator.ResetTrigger(HashPlayerDetected);
-            zombieAnimator.SetTrigger(HashPlayerDetected);
+            enemyAnimator.SetTrigger(HashPlayerDetected); // Idle -> Turn -> Scream -> Run
         }
     }
 
-    private void Update()
+    void Update()
     {
-        if (!chasing || zombie == null || player == null) return;
+        if (!chasing || player == null || agent == null) return;
+        if (!agent.isOnNavMesh) return;
 
-        // Altijd wel naar speler kijken (mag ook tijdens Turn/Scream)
-        Vector3 to = player.position - zombie.position;
+        var st  = enemyAnimator.GetCurrentAnimatorStateInfo(0);
+        var nxt = enemyAnimator.GetNextAnimatorStateInfo(0);
+        bool inRun = st.IsTag("Run") || nxt.IsTag("Run");
+
+        if (inRun)
+        {
+            // Tijdens Run: agent navigeert én mag zelf draaien
+            agent.updateRotation = true;
+            agent.isStopped = false;
+            agent.SetDestination(player.position);
+        }
+        else
+        {
+            // Tijdens Turn/Scream: NIET lopen, WEL naar speler kijken
+            agent.isStopped = true;
+            agent.updateRotation = false; // we draaien handmatig
+
+            Vector3 to = player.position - agent.transform.position;
+            to.y = 0f;
+            if (to.sqrMagnitude > 0.0001f)
+            {
+                Quaternion target = Quaternion.LookRotation(to);
+                agent.transform.rotation = Quaternion.Slerp(
+                    agent.transform.rotation,
+                    target,
+                    turnLerpBeforeScream * Time.deltaTime
+                );
+            }
+        }
+    }
+
+    // (Optioneel) roep deze via een Animation Event op frame 0 van je Scream-clip
+    public void AlignToPlayer()
+    {
+        if (!player || !agent) return;
+        Vector3 to = player.position - agent.transform.position;
         to.y = 0f;
         if (to.sqrMagnitude > 0.0001f)
-        {
-            Quaternion targetRot = Quaternion.Slerp(
-                zombie.rotation,
-                Quaternion.LookRotation(to),
-                turnLerp * Time.deltaTime
-            );
-            zombie.rotation = targetRot;
-        }
-
-        // >>> Alleen bewegen als de (huidige of volgende) state de Tag "Run" heeft <<<
-        var st = zombieAnimator.GetCurrentAnimatorStateInfo(0);
-        var next = zombieAnimator.GetNextAnimatorStateInfo(0);
-        bool isInOrGoingToRun = st.IsTag("Run") || next.IsTag("Run");
-
-        if (isInOrGoingToRun)
-        {
-            zombie.position += zombie.forward * chaseSpeed * Time.deltaTime;
-        }
-        // Niet in Run? -> NIET verplaatsen.
+            agent.transform.rotation = Quaternion.LookRotation(to);
     }
 }
