@@ -10,36 +10,33 @@ public class ActTwoDirector : MonoBehaviour
     public string leverInstalledFlag = "Act2_LeverInstalled";
 
     [Header("Walkie Talkie")]
-    [Tooltip("AudioSource used to play the periodic walkie ping (PlayOneShot).")]
+    [Tooltip("AudioSource used to play the periodic walkie ping (PlayOneShot). "
+           + "If null, we'll fall back to a camera 2D source for VO, but pings will be skipped.")]
     public AudioSource walkieSource;
     public AudioClip walkiePingClip;
-    [Tooltip("Seconds between pings while the walkie isn't found yet.")]
     public float walkiePingInterval = 8f;
-    [Tooltip("Small randomization added to interval (+/-).")]
     public float walkiePingJitter = 0.75f;
 
     [Header("Voice Lines")]
-    [Tooltip("VO line when the player picks up/found the walkie.")]
     public AudioClip voWalkieFound;
     [TextArea] public string subWalkieFound = "[Radio] *You found the walkie.*";
 
-    [Tooltip("VO when the player tries to operate the lever without a handle.")]
     public AudioClip voLeverMissing;
     [TextArea] public string subLeverMissing = "[You] I need a lever handle for this.";
 
-    [Tooltip("VO after the lever is installed (before elevator starts).")]
     public AudioClip voLeverInstalled;
     [TextArea] public string subLeverInstalled = "[You] That should do it.";
 
     [Header("Elevator")]
-    [Tooltip("AudioSource located near/inside the elevator to play movement rumble.")]
     public AudioSource elevatorSource;
     public AudioClip elevatorMoveClip;
 
     [Header("Subtitle pacing")]
     public float extraHold = 0.6f;
 
+    // internal
     Coroutine pingLoop;
+    AudioSource _fallback2D;   // camera-based 2D source used for VO if needed
 
     void Awake()
     {
@@ -50,13 +47,47 @@ public class ActTwoDirector : MonoBehaviour
 
     void Start()
     {
+        // Ensure we always have a valid VO source and set it for the queue
+        _fallback2D = GetOrMakeCamera2DSource();
+
+        if (VoiceLineQueue.Instance)
+        {
+            // Prefer walkieSource for default if assigned, else camera fallback
+            VoiceLineQueue.Instance.defaultVoiceSource = walkieSource ? walkieSource : _fallback2D;
+        }
+
         // Start/stop ping loop depending on whether walkie already found (saved or in-session)
         bool alreadyFound = SaveFlags.Instance && SaveFlags.Instance.Has(walkieFoundFlag);
         if (!alreadyFound) StartPingLoop();
     }
 
-    // --- PING LOOP ------------------------------------------------------------
+    // ---------- helpers ----------
+    AudioSource GetOrMakeCamera2DSource()
+    {
+        var cam = Camera.main;
+        if (!cam) return null;
 
+        var src = cam.GetComponent<AudioSource>();
+        if (!src) src = cam.gameObject.AddComponent<AudioSource>();
+        src.spatialBlend = 0f;  // 2D so it follows player
+        src.playOnAwake = false;
+        return src;
+    }
+
+    AudioSource PickVoSource(AudioSource preferred)
+    {
+        // Use preferred if assigned; else fallback to camera; else last resort create one on this GO
+        if (preferred) return preferred;
+        if (_fallback2D) return _fallback2D;
+
+        var src = GetComponent<AudioSource>();
+        if (!src) src = gameObject.AddComponent<AudioSource>();
+        src.spatialBlend = 0f;
+        src.playOnAwake = false;
+        return src;
+    }
+
+    // --- PING LOOP ------------------------------------------------------------
     public void StartPingLoop()
     {
         if (pingLoop != null) StopCoroutine(pingLoop);
@@ -86,16 +117,11 @@ public class ActTwoDirector : MonoBehaviour
         }
     }
 
-    // --- PUBLIC HOOKS YOU CALL FROM GAMEPLAY ---------------------------------
+    // --- PUBLIC HOOKS ---------------------------------------------------------
 
-    /// <summary>
-    /// Call this when the player picks up / interacts with the walkie talkie.
-    /// </summary>
     public void OnWalkieFound()
     {
-        // Set flag (session). Persist later on checkpoint with SaveFlags.Commit()
         if (SaveFlags.Instance) SaveFlags.Instance.Set(walkieFoundFlag);
-
         StopPingLoop();
 
         if (voWalkieFound || !string.IsNullOrEmpty(subWalkieFound))
@@ -105,14 +131,16 @@ public class ActTwoDirector : MonoBehaviour
                 clip = voWalkieFound,
                 subtitle = subWalkieFound,
                 extraHold = extraHold,
-                overrideSource = walkieSource // plays from the radio if assigned
+                overrideSource = PickVoSource(walkieSource) // use walkie if set, else fallback
             });
+        }
+        else
+        {
+            // nothing to play—clear any stale subtitle just in case
+            PersistentHUD.Instance?.ClearSubtitle();
         }
     }
 
-    /// <summary>
-    /// Call this when the player tries to use the lever without the required handle.
-    /// </summary>
     public void OnLeverMissingAttempt()
     {
         if (voLeverMissing || !string.IsNullOrEmpty(subLeverMissing))
@@ -121,19 +149,19 @@ public class ActTwoDirector : MonoBehaviour
             {
                 clip = voLeverMissing,
                 subtitle = subLeverMissing,
-                extraHold = extraHold
+                extraHold = extraHold,
+                overrideSource = PickVoSource(null) // use default/fallback
             });
+        }
+        else
+        {
+            PersistentHUD.Instance?.ClearSubtitle();
         }
     }
 
-    /// <summary>
-    /// Call this after the lever is successfully installed.
-    /// ActTwoDirector will play a VO line, then elevator move SFX, then request level transfer.
-    /// </summary>
     public void OnLeverInstalledThenTransfer(LeverBase lever)
     {
         if (SaveFlags.Instance) SaveFlags.Instance.Set(leverInstalledFlag);
-
         StartCoroutine(LeverInstalledFlow(lever));
     }
 
@@ -146,23 +174,26 @@ public class ActTwoDirector : MonoBehaviour
             {
                 clip = voLeverInstalled,
                 subtitle = subLeverInstalled,
-                extraHold = extraHold
+                extraHold = extraHold,
+                overrideSource = PickVoSource(null)
             });
         }
 
-        // Wait until all queued lines finish
+        // Wait until all queued lines finish (this also ensures subtitles clear at the end)
         if (VoiceLineQueue.Instance != null)
             yield return VoiceLineQueue.Instance.WaitUntilIdle();
+        else
+            PersistentHUD.Instance?.ClearSubtitle(); // safety
 
-        // 2) Elevator moving SFX (fire & forget, or wait a split second if you like)
-        if (elevatorSource && elevatorMoveClip)
-            elevatorSource.PlayOneShot(elevatorMoveClip);
+        // 2) Elevator moving SFX
+        var src = elevatorSource ? elevatorSource : PickVoSource(null);
+        if (src && elevatorMoveClip) src.PlayOneShot(elevatorMoveClip);
 
-        // Optional: small delay to let the elevator sound begin before fade/transfer
+        // tiny delay to let rumble start (optional)
         yield return new WaitForSeconds(0.2f);
 
-        // 3) Ask the lever to perform the transfer (fade & scene change)
+        // 3) Transfer
         if (lever != null)
-            lever.PullAndTransfer(); // needs to be public (see updated LeverBase below)
+            lever.PullAndTransfer();
     }
 }

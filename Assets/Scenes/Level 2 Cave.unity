@@ -4055,7 +4055,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupItemAction
   itemId: WalkieTalkie
-  worldModelToHide: {fileID: 0}
+  worldModelToHide: {fileID: 288725481}
   attachOnPickup: 1
   attachPoint: {fileID: 0}
   attachLocalPos: {x: 0, y: 0, z: 0}
@@ -21599,7 +21599,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
