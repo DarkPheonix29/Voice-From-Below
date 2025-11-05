@@ -7,13 +7,11 @@ using UnityEngine.InputSystem;
 public class Flashlight : MonoBehaviour
 {
     [Header("References")]
-    [Tooltip("Spotlight of point light voor de zaklamp.")]
     public Light flashlight;
-    [Tooltip("Pivot (meestal je camera) voor lichte sway/wobble.")]
     public Transform swayPivot;
 
     [Header("Input")]
-    [SerializeField] private KeyCode toggleKey = KeyCode.F; // <-- standaard F
+    [SerializeField] private KeyCode toggleKey = KeyCode.F;
 
     [Header("Light Settings")]
     public float maxIntensity = 3.5f;
@@ -32,6 +30,7 @@ public class Flashlight : MonoBehaviour
     public float swayLerpSpeed = 10f;
 
     private bool isOn;
+    private bool pickedUp = false; // <<< gate toggling until picked up
     private Quaternion baseRot;
     private Vector3 lastPos;
     private float movementAmount;
@@ -44,25 +43,18 @@ public class Flashlight : MonoBehaviour
     {
 #if ENABLE_INPUT_SYSTEM
         var map = new InputActionMap("Flashlight");
-        string keyPath = "<Keyboard>/f";  // <-- Altijd F, ongeacht toggleKey veld
+        string keyPath = "<Keyboard>/f";
         toggleAction = map.AddAction("Toggle", binding: keyPath);
         map.Enable();
 #endif
-
         if (!flashlight) flashlight = GetComponentInChildren<Light>(true);
         if (flashlight && flashlight.type != LightType.Spot) flashlight.type = LightType.Spot;
         if (flashlight) flashlight.cookie = cookie;
 
         isOn = startOn;
-
         if (flashlight)
         {
-            if (!isOn)
-            {
-                flashlight.intensity = 0f;
-                flashlight.range = 0f;
-                flashlight.enabled = false;
-            }
+            if (!isOn) { flashlight.intensity = 0f; flashlight.range = 0f; flashlight.enabled = false; }
         }
 
         baseRot = transform.localRotation;
@@ -81,10 +73,13 @@ public class Flashlight : MonoBehaviour
 
     bool WasTogglePressed()
     {
+        // <<< block input until picked up
+        if (!pickedUp) return false;
+
 #if ENABLE_INPUT_SYSTEM
         return toggleAction != null && toggleAction.WasPressedThisFrame();
 #else
-        return Input.GetKeyDown(toggleKey); // ← werkt ook zonder nieuw Input System
+        return Input.GetKeyDown(toggleKey);
 #endif
     }
 
@@ -131,21 +126,15 @@ public class Flashlight : MonoBehaviour
 
     public bool IsOn => isOn;
 
-    // -------------------------------
-    // Pickup / Drop (alle varianten)
-    // -------------------------------
-
+    // ---------- Pickup / Drop ----------
     public void PickUp()
     {
+        pickedUp = true; // <<<
         gameObject.SetActive(true);
         if (flashlight)
         {
             flashlight.enabled = isOn;
-            if (!isOn)
-            {
-                flashlight.intensity = 0f;
-                flashlight.range = 0f;
-            }
+            if (!isOn) { flashlight.intensity = 0f; flashlight.range = 0f; }
         }
     }
 
@@ -168,7 +157,6 @@ public class Flashlight : MonoBehaviour
         transform.localRotation = localRotation;
     }
 
-    // ✅ Overload voor jouw FlashlightPickup.cs
     public void PickUp(Transform parent, Vector3 localPosition, Vector3 localEulerAngles)
     {
         PickUp(parent);
@@ -179,6 +167,7 @@ public class Flashlight : MonoBehaviour
     public void Drop()
     {
         transform.SetParent(null, true);
+        pickedUp = false; // <<<
         isOn = false;
         if (flashlight)
         {

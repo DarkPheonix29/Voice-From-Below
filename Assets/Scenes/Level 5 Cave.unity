@@ -6496,6 +6496,63 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SurfaceIdOverride
   surfaceId: Rocks
+--- !u!1001 &1840002703
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7003873364039499672, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1333
+      objectReference: {fileID: 0}
+    - target: {fileID: 7003873364039499672, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 37.516647
+      objectReference: {fileID: 0}
+    - target: {fileID: 7003873364039499672, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2163
+      objectReference: {fileID: 0}
+    - target: {fileID: 7003873364039499672, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.4956349
+      objectReference: {fileID: 0}
+    - target: {fileID: 7003873364039499672, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7934439
+      objectReference: {fileID: 0}
+    - target: {fileID: 7003873364039499672, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.28107992
+      objectReference: {fileID: 0}
+    - target: {fileID: 7003873364039499672, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.21397893
+      objectReference: {fileID: 0}
+    - target: {fileID: 7003873364039499672, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -65.068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7003873364039499672, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 188.311
+      objectReference: {fileID: 0}
+    - target: {fileID: 7003873364039499672, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 213.706
+      objectReference: {fileID: 0}
+    - target: {fileID: 7672182251921384738, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
+      propertyPath: m_Name
+      value: Walkie Talkie
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
 --- !u!82 &1862908038 stripped
 AudioSource:
   m_CorrespondingSourceObject: {fileID: 950094440582740388, guid: a266d620e3a3a694db861659068bbe06, type: 3}
@@ -7414,3 +7471,4 @@ SceneRoots:
   - {fileID: 1954608933}
   - {fileID: 535446904}
   - {fileID: 1134557386}
+  - {fileID: 1840002703}

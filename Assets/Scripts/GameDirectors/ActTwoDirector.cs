@@ -17,15 +17,34 @@ public class ActTwoDirector : MonoBehaviour
     public float walkiePingInterval = 8f;
     public float walkiePingJitter = 0.75f;
 
+    // NEW: reference so we can force visibility while VO plays
+    [Tooltip("Optional: link to the WalkieTalkie component so we can force show it during VO.")]
+    public WalkieTalkie walkieRef;
+
+    // NEW: control VO routing + visibility behavior
+    [Header("Walkie VO Routing & Visibility")]
+    [Tooltip("Default route for VO when a line is marked 'via Walkie'. If true, use walkieSource; else fallback 2D.")]
+    public bool routeWalkieVOThroughWalkie = true;
+
+    [Tooltip("If true, force the walkie to be visible while a VO line marked 'via Walkie' is playing.")]
+    public bool makeWalkieVisibleOnWalkieVO = true;
+
+    [Tooltip("Extra seconds to keep the walkie visible after a VO line ends.")]
+    public float walkieVisibilityExtraHold = 0.5f;
+
     [Header("Voice Lines")]
     public AudioClip voWalkieFound;
     [TextArea] public string subWalkieFound = "[Radio] *You found the walkie.*";
+    // NEW: per-line toggle: is this line spoken over the walkie?
+    public bool voWalkieFoundViaWalkie = true;
 
     public AudioClip voLeverMissing;
     [TextArea] public string subLeverMissing = "[You] I need a lever handle for this.";
+    public bool voLeverMissingViaWalkie = false; // probably the player speaking, not radio
 
     public AudioClip voLeverInstalled;
     [TextArea] public string subLeverInstalled = "[You] That should do it.";
+    public bool voLeverInstalledViaWalkie = false;
 
     [Header("Elevator")]
     public AudioSource elevatorSource;
@@ -74,10 +93,12 @@ public class ActTwoDirector : MonoBehaviour
         return src;
     }
 
-    AudioSource PickVoSource(AudioSource preferred)
+    AudioSource PickVoSourceForWalkieFlag(bool viaWalkie)
     {
-        // Use preferred if assigned; else fallback to camera; else last resort create one on this GO
-        if (preferred) return preferred;
+        if (viaWalkie && routeWalkieVOThroughWalkie && walkieSource)
+            return walkieSource;
+
+        // otherwise use fallback / queue default
         if (_fallback2D) return _fallback2D;
 
         var src = GetComponent<AudioSource>();
@@ -85,6 +106,12 @@ public class ActTwoDirector : MonoBehaviour
         src.spatialBlend = 0f;
         src.playOnAwake = false;
         return src;
+    }
+
+    float EstimateClipDuration(AudioClip clip, float minimum = 0.5f)
+    {
+        if (!clip) return minimum;
+        return Mathf.Max(minimum, clip.length);
     }
 
     // --- PING LOOP ------------------------------------------------------------
@@ -119,44 +146,49 @@ public class ActTwoDirector : MonoBehaviour
 
     // --- PUBLIC HOOKS ---------------------------------------------------------
 
+    // CENTRAL helper to enqueue VO (with optional "via walkie" behavior)
+    void EnqueueVO(AudioClip clip, string subtitle, bool viaWalkie)
+    {
+        if (string.IsNullOrEmpty(subtitle) && clip == null)
+        {
+            PersistentHUD.Instance?.ClearSubtitle();
+            return;
+        }
+
+        var src = PickVoSourceForWalkieFlag(viaWalkie);
+
+        // Make the physical walkie visible while the VO plays (if requested)
+        if (viaWalkie && makeWalkieVisibleOnWalkieVO)
+        {
+            var visDur = EstimateClipDuration(clip, 0.75f) + extraHold + walkieVisibilityExtraHold;
+            if (!walkieRef)
+            {
+                // Try to find a walkie in the scene if not assigned
+                walkieRef = FindObjectOfType<WalkieTalkie>(includeInactive: true);
+            }
+            if (walkieRef) walkieRef.ForceShow(visDur);
+        }
+
+        VoiceLineQueue.Instance?.Enqueue(new VoiceLine
+        {
+            clip = clip,
+            subtitle = subtitle,
+            extraHold = extraHold,
+            overrideSource = src
+        });
+    }
+
     public void OnWalkieFound()
     {
         if (SaveFlags.Instance) SaveFlags.Instance.Set(walkieFoundFlag);
         StopPingLoop();
 
-        if (voWalkieFound || !string.IsNullOrEmpty(subWalkieFound))
-        {
-            VoiceLineQueue.Instance?.Enqueue(new VoiceLine
-            {
-                clip = voWalkieFound,
-                subtitle = subWalkieFound,
-                extraHold = extraHold,
-                overrideSource = PickVoSource(walkieSource) // use walkie if set, else fallback
-            });
-        }
-        else
-        {
-            // nothing to play—clear any stale subtitle just in case
-            PersistentHUD.Instance?.ClearSubtitle();
-        }
+        EnqueueVO(voWalkieFound, subWalkieFound, viaWalkie: voWalkieFoundViaWalkie);
     }
 
     public void OnLeverMissingAttempt()
     {
-        if (voLeverMissing || !string.IsNullOrEmpty(subLeverMissing))
-        {
-            VoiceLineQueue.Instance?.Enqueue(new VoiceLine
-            {
-                clip = voLeverMissing,
-                subtitle = subLeverMissing,
-                extraHold = extraHold,
-                overrideSource = PickVoSource(null) // use default/fallback
-            });
-        }
-        else
-        {
-            PersistentHUD.Instance?.ClearSubtitle();
-        }
+        EnqueueVO(voLeverMissing, subLeverMissing, viaWalkie: voLeverMissingViaWalkie);
     }
 
     public void OnLeverInstalledThenTransfer(LeverBase lever)
@@ -167,32 +199,22 @@ public class ActTwoDirector : MonoBehaviour
 
     IEnumerator LeverInstalledFlow(LeverBase lever)
     {
-        // 1) VO: Lever installed
-        if (voLeverInstalled || !string.IsNullOrEmpty(subLeverInstalled))
-        {
-            VoiceLineQueue.Instance?.Enqueue(new VoiceLine
-            {
-                clip = voLeverInstalled,
-                subtitle = subLeverInstalled,
-                extraHold = extraHold,
-                overrideSource = PickVoSource(null)
-            });
-        }
+        // 1) VO
+        EnqueueVO(voLeverInstalled, subLeverInstalled, viaWalkie: voLeverInstalledViaWalkie);
 
-        // Wait until all queued lines finish (this also ensures subtitles clear at the end)
+        // 2) Wait until VO queue is empty (and ensures subtitles clear)
         if (VoiceLineQueue.Instance != null)
             yield return VoiceLineQueue.Instance.WaitUntilIdle();
         else
-            PersistentHUD.Instance?.ClearSubtitle(); // safety
+            PersistentHUD.Instance?.ClearSubtitle();
 
-        // 2) Elevator moving SFX
-        var src = elevatorSource ? elevatorSource : PickVoSource(null);
+        // 3) Elevator SFX
+        var src = elevatorSource ? elevatorSource : PickVoSourceForWalkieFlag(false);
         if (src && elevatorMoveClip) src.PlayOneShot(elevatorMoveClip);
 
-        // tiny delay to let rumble start (optional)
         yield return new WaitForSeconds(0.2f);
 
-        // 3) Transfer
+        // 4) Transfer
         if (lever != null)
             lever.PullAndTransfer();
     }
