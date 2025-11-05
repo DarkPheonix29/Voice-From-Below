@@ -16,7 +16,7 @@ public class LeverBase : MonoBehaviour, IInteractable
     [Tooltip("If true, the lever starts installed (for prefabs that visually include the handle).")]
     public bool startInstalled = false;
 
-    [Tooltip("If true, after installation it immediately pulls and transfers (single press).")]
+    [Tooltip("If true, after installation it immediately pulls and transfers (single press). NOTE: If ActTwoDirector is present, the director will override timing to play VO first.")]
     public bool installThenPull = false;
 
     [Header("Socket")]
@@ -54,13 +54,12 @@ public class LeverBase : MonoBehaviour, IInteractable
     {
         if (promptCanvas) promptCanvas.enabled = false;
 
-        // 1) If this lever was previously installed in this playthrough, restore it now.
+        // Restore installed state from SaveFlags if present
         if (!installed && SaveFlags.Instance && SaveFlags.Instance.Has(leverId))
         {
             installed = true;
             SpawnInstalledVisual();
         }
-        // 2) Otherwise, if this lever prefab should start installed, do so and remember it.
         else if (!installed && startInstalled)
         {
             installed = true;
@@ -88,6 +87,15 @@ public class LeverBase : MonoBehaviour, IInteractable
         if (!installed)
         {
             if (!TryInstall()) return;
+
+            // If ActTwoDirector is present, let it handle VO/elevator/transfer timing.
+            if (ActTwoDirector.Instance != null)
+            {
+                ActTwoDirector.Instance.OnLeverInstalledThenTransfer(this);
+                return;
+            }
+
+            // Fallback: original behavior
             if (!installThenPull) return; // second press to pull unless one-press desired
         }
 
@@ -96,7 +104,6 @@ public class LeverBase : MonoBehaviour, IInteractable
 
     bool TryInstall()
     {
-        // No item required? Skip the inventory check.
         string needId = string.IsNullOrWhiteSpace(requiredItemId) ? null : requiredItemId.Trim();
 
         if (needId != null)
@@ -104,10 +111,15 @@ public class LeverBase : MonoBehaviour, IInteractable
             if (Inventory.Instance == null || !Inventory.Instance.Has(needId))
             {
                 PersistentHUD.Instance?.ShowSubtitle(promptNeedLever, 1.2f, false);
+
+                // NEW: Notify ActTwoDirector for a VO line when lever is missing
+                if (ActTwoDirector.Instance != null)
+                    ActTwoDirector.Instance.OnLeverMissingAttempt();
+
                 return false;
             }
 
-            // If you want to consume the handle, uncomment the next line.
+            // If you want to consume the handle, uncomment:
             // Inventory.Instance.Remove(needId);
         }
 
@@ -120,10 +132,11 @@ public class LeverBase : MonoBehaviour, IInteractable
         installed = true;
         SpawnInstalledVisual();
 
-        // Remember this lever is installed for this playthrough
+        // Remember this lever is installed for this playthrough (session; persist on Commit)
         if (SaveFlags.Instance) SaveFlags.Instance.Set(leverId);
 
         PersistentHUD.Instance?.ShowSubtitle("Lever installed.", 1.0f, false);
+        UpdatePrompt();
         return true;
     }
 
@@ -137,7 +150,8 @@ public class LeverBase : MonoBehaviour, IInteractable
         installedLever.localRotation = Quaternion.Euler(installedLocalEulerOffset);
     }
 
-    void PullAndTransfer()
+    // Made public so ActTwoDirector can call this after VO & elevator SFX.
+    public void PullAndTransfer()
     {
         // Optional: play a tiny lever pull anim here using installedLever
 
