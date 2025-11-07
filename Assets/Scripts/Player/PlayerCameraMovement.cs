@@ -6,6 +6,7 @@ public class cam : MonoBehaviour
 {
     public Transform playerbody;
 
+    // Dit blijft je "basis"-multiplier (kan je per wapen/scene tunen)
     [Range(0.1f, 10f)] public float sensitivity = 1f;
 
     public float bobAmplitude = 0.05f;
@@ -43,9 +44,13 @@ public class cam : MonoBehaviour
 
     void Update()
     {
+        // Lees elke frame de waarde uit de Settings (werkt live tijdens slepen)
+   float uiSens = GameSettingsManager.Instance ? GameSettingsManager.Instance.MouseSensitivity : 1f;
+float effectiveSens = sensitivity * uiSens;
+
         Vector2 delta = look.ReadValue<Vector2>();
-        float mouseX = delta.x * 0.075f * sensitivity;
-        float mouseY = delta.y * 0.075f * sensitivity;
+        float mouseX = delta.x * 0.075f * effectiveSens;
+        float mouseY = delta.y * 0.075f * effectiveSens;
 
         xRot -= mouseY;
         xRot = Mathf.Clamp(xRot, -90f, 90f);
@@ -88,4 +93,3 @@ public class cam : MonoBehaviour
         }
     }
 }
-    
