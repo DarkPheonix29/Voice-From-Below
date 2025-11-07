@@ -4,7 +4,9 @@ using UnityEngine.InputSystem;
 [DisallowMultipleComponent]
 public class cam : MonoBehaviour
 {
-    public Transform playerbody;
+    public Transform playerbody;    // player root for yaw
+    public Transform pitchTarget;   // usually CameraPivot (this object)
+    public Transform bobTarget;     // NEW: the HeadBob child
 
     // Dit blijft je "basis"-multiplier (kan je per wapen/scene tunen)
     [Range(0.1f, 10f)] public float sensitivity = 1f;
@@ -14,7 +16,6 @@ public class cam : MonoBehaviour
     public float swayAmplitude = 0.02f;
     public float returnSpeed = 10f;
     public float moveThreshold = 0.02f;
-
     public float sprintBobMultiplier = 1.8f;
     public float crouchBobMultiplier = 0.5f;
 
@@ -27,41 +28,88 @@ public class cam : MonoBehaviour
     CharacterController cc;
     FPPlayer player;
 
-    void Start()
+    bool _pausedByCutscene;
+
+    public void PauseForCutscene(bool pause) { _pausedByCutscene = pause; if (pause) bobPhase = 0f; }
+
+    void Awake()
     {
+        // Initial setup for references and input actions
+        if (!pitchTarget) pitchTarget = transform;
+        if (!bobTarget) bobTarget = pitchTarget; 
+
         Cursor.lockState = CursorLockMode.Locked;
 
         var map = new InputActionMap("Camera");
         look = map.AddAction("Look");
         look.AddBinding("<Mouse>/delta");
         map.Enable();
-
-        restLocalPos = transform.localPosition;
-        lastBodyPos = playerbody.position;
+        
+        // Get components early
         cc = playerbody.GetComponent<CharacterController>();
         player = playerbody.GetComponent<FPPlayer>();
+
+        // Temporarily set restLocalPos to zero/initial value.
+        // The *correct* value will be captured in the coroutine.
+        restLocalPos = bobTarget.localPosition; 
     }
 
-    void Update()
+    void Start()
     {
         // Lees elke frame de waarde uit de Settings (werkt live tijdens slepen)
    float uiSens = GameSettingsManager.Instance ? GameSettingsManager.Instance.MouseSensitivity : 1f;
 float effectiveSens = sensitivity * uiSens;
 
+        // Start the coroutine to wait until the player has landed.
+        StartCoroutine(InitializeCameraPositionAfterLanding());
+    }
+
+    System.Collections.IEnumerator InitializeCameraPositionAfterLanding()
+    {
+        // 1. Wait for one frame to let all Start() methods and initial physics run.
+        yield return null; 
+
+        // 2. Wait until the Character Controller is grounded. This handles the fall.
+        if (cc != null)
+        {
+            while (!cc.isGrounded)
+            {
+                yield return null;
+            }
+        }
+
+        // 3. Now the player has landed and the position is finalized.
+        // CAPTURE THE TRUE RESTING POSITION HERE.
+        restLocalPos = bobTarget.localPosition;
+        lastBodyPos = playerbody.position;
+    }
+
+    void LateUpdate()
+    {
+        if (_pausedByCutscene) return;
+
+        // Note: We skip input and rotation for the first few frames until restLocalPos is set.
+        // This is generally fine since the player won't be moving much yet.
+        
         Vector2 delta = look.ReadValue<Vector2>();
         float mouseX = delta.x * 0.075f * effectiveSens;
         float mouseY = delta.y * 0.075f * effectiveSens;
 
         xRot -= mouseY;
         xRot = Mathf.Clamp(xRot, -90f, 90f);
-        transform.localRotation = Quaternion.Euler(xRot, 0, 0);
-        playerbody.Rotate(Vector3.up * mouseX);
+        if (pitchTarget) pitchTarget.localRotation = Quaternion.Euler(xRot, 0, 0);
+
+        if (playerbody) playerbody.Rotate(Vector3.up * mouseX);
 
         HeadWobble();
-    }
+    } 
 
     void HeadWobble()
     {
+        // Only run bob/sway logic if the rest position has been successfully captured.
+        if (restLocalPos == Vector3.zero && bobTarget.localPosition != Vector3.zero) return;
+        if (!bobTarget) return;
+
         Vector3 bodyDelta = playerbody.position - lastBodyPos;
         lastBodyPos = playerbody.position;
 
@@ -84,12 +132,12 @@ float effectiveSens = sensitivity * uiSens;
             float bobY = Mathf.Sin(bobPhase) * amp;
             float bobX = Mathf.Sin(bobPhase * 0.5f) * swayAmplitude;
             Vector3 target = restLocalPos + new Vector3(bobX, bobY, 0f);
-            transform.localPosition = Vector3.Lerp(transform.localPosition, target, Time.deltaTime * returnSpeed);
+            bobTarget.localPosition = Vector3.Lerp(bobTarget.localPosition, target, Time.deltaTime * returnSpeed);
         }
         else
         {
             bobPhase = 0f;
-            transform.localPosition = Vector3.Lerp(transform.localPosition, restLocalPos, Time.deltaTime * returnSpeed);
+            bobTarget.localPosition = Vector3.Lerp(bobTarget.localPosition, restLocalPos, Time.deltaTime * returnSpeed);
         }
     }
 }
