@@ -674,6 +674,25 @@ MonoBehaviour:
   angularDragWhileDrag: 2
   scrollRotateDegreesPerNotch: 8
   invertScroll: 0
+--- !u!114 &283934078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283934071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d09440f28bd18474eacd7a81460badba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoxDragInteractable
+  promptCanvas: {fileID: 0}
+  promptLabel: {fileID: 0}
+  promptText: Press E to interact
+  oneShot: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &306773913 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7672182251921384738, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
@@ -691,10 +710,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 464c533e5ac91994da1879be844a86df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WalkieTalkiePickup
-  walkieTalkie: {fileID: 306773918}
-  attachPoint: {fileID: 1604549767}
-  attachLocalPos: {x: 0, y: 0, z: 0}
-  attachLocalRotEuler: {x: 0, y: 0, z: 0}
 --- !u!114 &306773918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -857,37 +872,25 @@ MonoBehaviour:
   angularDragWhileDrag: 2
   scrollRotateDegreesPerNotch: 8
   invertScroll: 0
---- !u!1 &385410187
-GameObject:
+--- !u!114 &362475418
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 385410188}
-  m_Layer: 0
-  m_Name: BoxHolder
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &385410188
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 385410187}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1329720643}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_GameObject: {fileID: 362475411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d09440f28bd18474eacd7a81460badba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoxDragInteractable
+  promptCanvas: {fileID: 0}
+  promptLabel: {fileID: 0}
+  promptText: Press E to interact
+  oneShot: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &388987785
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -945,6 +948,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2087306369116454512, guid: d9b351d286670f74781ce38907bc981d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1118318164}
     - targetCorrespondingSourceObject: {fileID: 2087306369116454512, guid: d9b351d286670f74781ce38907bc981d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1118318158}
@@ -2386,6 +2392,9 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4586633326216796365, guid: 9a5d91fe8c9669f4d8c62b20c1498637, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 283934078}
+    - targetCorrespondingSourceObject: {fileID: 4586633326216796365, guid: 9a5d91fe8c9669f4d8c62b20c1498637, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 283934072}
   m_SourcePrefab: {fileID: 100100000, guid: 9a5d91fe8c9669f4d8c62b20c1498637, type: 3}
 --- !u!1 &900076207
@@ -2903,7 +2912,7 @@ Transform:
   m_GameObject: {fileID: 1056775996}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.028788278, z: 0, w: 0.99958557}
-  m_LocalPosition: {x: 474.71, y: 3.0400002, z: 476.73}
+  m_LocalPosition: {x: -0.4, y: 3.0400002, z: -2.1}
   m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3193,6 +3202,25 @@ MonoBehaviour:
   angularDragWhileDrag: 2
   scrollRotateDegreesPerNotch: 8
   invertScroll: 0
+--- !u!114 &1118318164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118318157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d09440f28bd18474eacd7a81460badba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoxDragInteractable
+  promptCanvas: {fileID: 0}
+  promptLabel: {fileID: 0}
+  promptText: Press E to interact
+  oneShot: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1142559078
 GameObject:
   m_ObjectHideFlags: 0
@@ -3442,21 +3470,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 850ab3e8a18b3274bb706a5e0ed3855b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlashlightPickup
-  flashlight: {fileID: 1180804257}
-  attachPoint: {fileID: 0}
-  attachLocalPos: {x: 0, y: 0, z: 0}
-  attachLocalRotEuler: {x: 0, y: 0, z: 0}
---- !u!114 &1180804257 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5224205437319797828, guid: d1f0bce338a435f4fb97512a0c68868a, type: 3}
-  m_PrefabInstance: {fileID: 367957845970764919}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1180804254}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ed53e5ae2da4c84b979603c75a95140, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Flashlight
 --- !u!1 &1197148300
 GameObject:
   m_ObjectHideFlags: 0
@@ -3758,6 +3771,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3234896681229809100, guid: 73f8e627fe2775b46bd72d701a2744d2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 362475418}
     - targetCorrespondingSourceObject: {fileID: 3234896681229809100, guid: 73f8e627fe2775b46bd72d701a2744d2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 362475412}
@@ -4206,13 +4222,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5445241f366f3804cbc10c82d21e5a19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LookInteract
-  cam: {fileID: 0}
-  interactDistance: 4
-  interactRadius: 0.25
-  interactMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  interactKey: 19
 --- !u!1 &1361965527
 GameObject:
   m_ObjectHideFlags: 0
@@ -4564,37 +4573,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1565021747}
   m_CullTransparentMesh: 1
---- !u!1 &1604549766
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1604549767}
-  m_Layer: 0
-  m_Name: WalkiTalkieHolder
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1604549767
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1604549766}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.29883626, y: -0.6408564, z: -0.6408564, w: -0.29883626}
-  m_LocalPosition: {x: -0.63, y: -0.3, z: 0.8}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1329720643}
-  m_LocalEulerAnglesHint: {x: -90, y: 270, z: 220}
 --- !u!1001 &1637568174
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6102,6 +6080,14 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 4426351618526396816, guid: a266d620e3a3a694db861659068bbe06, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426351618526396816, guid: a266d620e3a3a694db861659068bbe06, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.1
+      objectReference: {fileID: 0}
     - target: {fileID: 4849219945184648535, guid: a266d620e3a3a694db861659068bbe06, type: 3}
       propertyPath: field of view
       value: 40
@@ -6223,17 +6209,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7874407737591238665, guid: a266d620e3a3a694db861659068bbe06, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 4426351618526396816, guid: a266d620e3a3a694db861659068bbe06, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2113660899}
-    - targetCorrespondingSourceObject: {fileID: 4426351618526396816, guid: a266d620e3a3a694db861659068bbe06, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1604549767}
-    - targetCorrespondingSourceObject: {fileID: 4426351618526396816, guid: a266d620e3a3a694db861659068bbe06, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 385410188}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3746007977827057265, guid: a266d620e3a3a694db861659068bbe06, type: 3}
       insertIndex: 3
