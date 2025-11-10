@@ -18,6 +18,8 @@ public class cam : MonoBehaviour
     public float moveThreshold = 0.02f;
     public float sprintBobMultiplier = 1.8f;
     public float crouchBobMultiplier = 0.5f;
+    float effectiveSens = 1f;
+
 
     float xRot;
     InputAction look;
