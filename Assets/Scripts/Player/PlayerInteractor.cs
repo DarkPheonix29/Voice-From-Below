@@ -1,4 +1,3 @@
-// PlayerInteractor.cs
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -11,15 +10,17 @@ public class PlayerInteractor : MonoBehaviour
 
     [Header("Settings")]
     public float interactDistance = 3f;
-    public float interactRadius = 0.2f;         // small sphere to make aiming friendlier
+    public float interactRadius = 0.2f;
     public LayerMask interactMask = ~0;
 
 #if ENABLE_INPUT_SYSTEM
-    public InputAction interactAction = new InputAction("Interact", InputActionType.Button, "<Keyboard>/e");
+    // now uses left mouse click
+    public InputAction interactAction = new InputAction("Interact", InputActionType.Button, "<Mouse>/leftButton");
     void OnEnable(){ interactAction.Enable(); }
     void OnDisable(){ interactAction.Disable(); }
 #else
-    public KeyCode interactKey = KeyCode.E;
+    // fallback for old input system
+    public KeyCode interactKey = KeyCode.Mouse0;
 #endif
 
     Interactable current;
@@ -57,6 +58,7 @@ public class PlayerInteractor : MonoBehaviour
 #else
         bool pressed = Input.GetKeyDown(interactKey);
 #endif
+
         if (pressed && current != null)
             current.Interact();
     }

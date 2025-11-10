@@ -29,14 +29,13 @@ public class Interactable : MonoBehaviour
         if (promptCanvas) promptCanvas.enabled = false;
     }
 
-    public void SetHighlighted(bool on)
+    public virtual void SetHighlighted(bool on)
     {
         if (!_enabled) on = false;
         if (promptCanvas) promptCanvas.enabled = on;
-        // If you use an outline/highlight shader, toggle it here too
     }
 
-    public void Interact()
+    public virtual void Interact()
     {
         if (!_enabled) return;
         Debug.Log($"[Interactable] Interact on {name}");

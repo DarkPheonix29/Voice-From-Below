@@ -26547,7 +26547,7 @@ PrefabInstance:
     - target: {fileID: 449959785238663378, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
       propertyPath: attachPoint
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 115067746}
     - target: {fileID: 449959785238663378, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
       propertyPath: walkieToAttach
       value: 
