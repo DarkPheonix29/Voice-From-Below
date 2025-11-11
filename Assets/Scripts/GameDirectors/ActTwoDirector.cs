@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ActTwoDirector : MonoBehaviour
 {
@@ -11,36 +13,28 @@ public class ActTwoDirector : MonoBehaviour
 
     [Header("Walkie Talkie")]
     [Tooltip("AudioSource used to play the periodic walkie ping (PlayOneShot). "
-           + "If null, we'll fall back to a camera 2D source for VO, but pings will be skipped.")]
+           + "If null, we'll fall back to a 2D persistent/camera source so pings and VO keep working.")]
     public AudioSource walkieSource;
     public AudioClip walkiePingClip;
     public float walkiePingInterval = 8f;
     public float walkiePingJitter = 0.75f;
 
-    // NEW: reference so we can force visibility while VO plays
     [Tooltip("Optional: link to the WalkieTalkie component so we can force show it during VO.")]
     public WalkieTalkie walkieRef;
 
-    // NEW: control VO routing + visibility behavior
     [Header("Walkie VO Routing & Visibility")]
-    [Tooltip("Default route for VO when a line is marked 'via Walkie'. If true, use walkieSource; else fallback 2D.")]
     public bool routeWalkieVOThroughWalkie = true;
-
-    [Tooltip("If true, force the walkie to be visible while a VO line marked 'via Walkie' is playing.")]
     public bool makeWalkieVisibleOnWalkieVO = true;
-
-    [Tooltip("Extra seconds to keep the walkie visible after a VO line ends.")]
     public float walkieVisibilityExtraHold = 0.5f;
 
     [Header("Voice Lines")]
     public AudioClip voWalkieFound;
     [TextArea] public string subWalkieFound = "[Radio] *You found the walkie.*";
-    // NEW: per-line toggle: is this line spoken over the walkie?
     public bool voWalkieFoundViaWalkie = true;
 
     public AudioClip voLeverMissing;
     [TextArea] public string subLeverMissing = "[You] I need a lever handle for this.";
-    public bool voLeverMissingViaWalkie = false; // probably the player speaking, not radio
+    public bool voLeverMissingViaWalkie = false;
 
     public AudioClip voLeverInstalled;
     [TextArea] public string subLeverInstalled = "[You] That should do it.";
@@ -53,34 +47,78 @@ public class ActTwoDirector : MonoBehaviour
     [Header("Subtitle pacing")]
     public float extraHold = 0.6f;
 
+    [Header("Scene gating for walkie ping")]
+    [Tooltip("If true, the periodic walkie ping only plays in the scenes listed below.")]
+    public bool limitWalkiePingToSpecificScenes = true;
+
+    [Tooltip("Scene names where the walkie ping is allowed. Example: \"Level2\".")]
+    public string[] pingEnabledScenes = new[] { "Level2" };
+
     // internal
     Coroutine pingLoop;
-    AudioSource _fallback2D;   // camera-based 2D source used for VO if needed
+    AudioSource _fallback2D;           // camera-based 2D source (scene)
+    AudioSource _persistentWalkie2D;   // DDOL 2D source (always valid)
+    bool _walkieFoundAnnounced = false;
+
+    void OnEnable()  => SceneManager.sceneLoaded += OnSceneLoaded;
+    void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
     void Awake()
     {
         if (Instance && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        _persistentWalkie2D = gameObject.AddComponent<AudioSource>();
+        _persistentWalkie2D.playOnAwake = false;
+        _persistentWalkie2D.spatialBlend = 0f; // 2D
     }
 
     void Start()
     {
-        // Ensure we always have a valid VO source and set it for the queue
-        _fallback2D = GetOrMakeCamera2DSource();
+        RefreshAudioBindings();
+        MaybeStartOrStopPingBasedOnState();
+    }
 
-        if (VoiceLineQueue.Instance)
-        {
-            // Prefer walkieSource for default if assigned, else camera fallback
-            VoiceLineQueue.Instance.defaultVoiceSource = walkieSource ? walkieSource : _fallback2D;
-        }
-
-        // Start/stop ping loop depending on whether walkie already found (saved or in-session)
-        bool alreadyFound = SaveFlags.Instance && SaveFlags.Instance.Has(walkieFoundFlag);
-        if (!alreadyFound) StartPingLoop();
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        RefreshAudioBindings();
+        // Start/stop the ping depending on the new scene and flag state
+        MaybeStartOrStopPingBasedOnState();
     }
 
     // ---------- helpers ----------
+    void RefreshAudioBindings()
+    {
+        _fallback2D = GetOrMakeCamera2DSource();
+
+        if (!walkieRef)
+            walkieRef = FindObjectOfType<WalkieTalkie>(includeInactive: true);
+
+        if (!walkieSource || (walkieSource && walkieSource.gameObject == null))
+        {
+            if (walkieRef)
+            {
+                var src = walkieRef.GetComponent<AudioSource>();
+                if (!src) src = walkieRef.gameObject.AddComponent<AudioSource>();
+                src.playOnAwake = false;
+                src.spatialBlend = 1f; // 3D on the prop
+                walkieSource = src;
+            }
+            else
+            {
+                walkieSource = null;
+            }
+        }
+
+        if (VoiceLineQueue.Instance)
+        {
+            VoiceLineQueue.Instance.defaultVoiceSource =
+                walkieSource ? walkieSource :
+                (_persistentWalkie2D ? _persistentWalkie2D : _fallback2D);
+        }
+    }
+
     AudioSource GetOrMakeCamera2DSource()
     {
         var cam = Camera.main;
@@ -88,30 +126,53 @@ public class ActTwoDirector : MonoBehaviour
 
         var src = cam.GetComponent<AudioSource>();
         if (!src) src = cam.gameObject.AddComponent<AudioSource>();
-        src.spatialBlend = 0f;  // 2D so it follows player
+        src.spatialBlend = 0f;  // 2D
         src.playOnAwake = false;
         return src;
     }
 
     AudioSource PickVoSourceForWalkieFlag(bool viaWalkie)
     {
-        if (viaWalkie && routeWalkieVOThroughWalkie && walkieSource)
-            return walkieSource;
+        if (viaWalkie && routeWalkieVOThroughWalkie)
+        {
+            if (walkieSource) return walkieSource;               // 3D on prop
+            if (_persistentWalkie2D) return _persistentWalkie2D; // DDOL 2D
+        }
 
-        // otherwise use fallback / queue default
-        if (_fallback2D) return _fallback2D;
-
-        var src = GetComponent<AudioSource>();
-        if (!src) src = gameObject.AddComponent<AudioSource>();
-        src.spatialBlend = 0f;
-        src.playOnAwake = false;
-        return src;
+        if (_fallback2D) return _fallback2D;                     // camera 2D
+        if (!_persistentWalkie2D)
+        {
+            _persistentWalkie2D = gameObject.AddComponent<AudioSource>();
+            _persistentWalkie2D.playOnAwake = false;
+            _persistentWalkie2D.spatialBlend = 0f;
+        }
+        return _persistentWalkie2D;
     }
 
     float EstimateClipDuration(AudioClip clip, float minimum = 0.5f)
+        => Mathf.Max(minimum, clip ? clip.length : 0f);
+
+    bool IsPingAllowedInCurrentScene()
     {
-        if (!clip) return minimum;
-        return Mathf.Max(minimum, clip.length);
+        if (!limitWalkiePingToSpecificScenes) return true;
+
+        var sceneName = SceneManager.GetActiveScene().name;
+        if (string.IsNullOrEmpty(sceneName) || pingEnabledScenes == null || pingEnabledScenes.Length == 0)
+            return false;
+
+        // Case-insensitive compare
+        return pingEnabledScenes.Any(s => !string.IsNullOrEmpty(s) &&
+                                          string.Equals(s, sceneName, System.StringComparison.OrdinalIgnoreCase));
+    }
+
+    void MaybeStartOrStopPingBasedOnState()
+    {
+        bool alreadyFound = SaveFlags.Instance && SaveFlags.Instance.Has(walkieFoundFlag);
+
+        if (!alreadyFound && IsPingAllowedInCurrentScene())
+            StartPingLoop();
+        else
+            StopPingLoop(); // stops immediately on leaving Level 2
     }
 
     // --- PING LOOP ------------------------------------------------------------
@@ -132,21 +193,31 @@ public class ActTwoDirector : MonoBehaviour
 
     IEnumerator PingRoutine()
     {
-        // Keep pinging until the walkie is found
+        // Keep coroutine alive; only fire pings when allowed & until walkie is found.
         while (!(SaveFlags.Instance && SaveFlags.Instance.Has(walkieFoundFlag)))
         {
-            if (walkieSource && walkiePingClip)
-                walkieSource.PlayOneShot(walkiePingClip);
+            if (IsPingAllowedInCurrentScene())
+            {
+                var pingSrc = walkieSource ?? _persistentWalkie2D ?? _fallback2D;
+                if (pingSrc && walkiePingClip)
+                    pingSrc.PlayOneShot(walkiePingClip);
 
-            float jitter = Random.Range(-walkiePingJitter, walkiePingJitter);
-            float wait = Mathf.Max(0.25f, walkiePingInterval + jitter);
-            yield return new WaitForSeconds(wait);
+                float jitter = Random.Range(-walkiePingJitter, walkiePingJitter);
+                float wait = Mathf.Max(0.25f, walkiePingInterval + jitter);
+                yield return new WaitForSeconds(wait);
+            }
+            else
+            {
+                // Outside allowed scenes: do nothing until we re-enter (e.g., Level 2)
+                yield return null;
+            }
         }
+
+        // found: ensure loop is cleared
+        StopPingLoop();
     }
 
     // --- PUBLIC HOOKS ---------------------------------------------------------
-
-    // CENTRAL helper to enqueue VO (with optional "via walkie" behavior)
     void EnqueueVO(AudioClip clip, string subtitle, bool viaWalkie)
     {
         if (string.IsNullOrEmpty(subtitle) && clip == null)
@@ -157,15 +228,10 @@ public class ActTwoDirector : MonoBehaviour
 
         var src = PickVoSourceForWalkieFlag(viaWalkie);
 
-        // Make the physical walkie visible while the VO plays (if requested)
         if (viaWalkie && makeWalkieVisibleOnWalkieVO)
         {
             var visDur = EstimateClipDuration(clip, 0.75f) + extraHold + walkieVisibilityExtraHold;
-            if (!walkieRef)
-            {
-                // Try to find a walkie in the scene if not assigned
-                walkieRef = FindObjectOfType<WalkieTalkie>(includeInactive: true);
-            }
+            if (!walkieRef) walkieRef = FindObjectOfType<WalkieTalkie>(includeInactive: true);
             if (walkieRef) walkieRef.ForceShow(visDur);
         }
 
@@ -180,9 +246,13 @@ public class ActTwoDirector : MonoBehaviour
 
     public void OnWalkieFound()
     {
-        if (SaveFlags.Instance) SaveFlags.Instance.Set(walkieFoundFlag);
-        StopPingLoop();
+        if ((SaveFlags.Instance && SaveFlags.Instance.Has(walkieFoundFlag)) || _walkieFoundAnnounced)
+            return;
 
+        _walkieFoundAnnounced = true;
+        if (SaveFlags.Instance) SaveFlags.Instance.Set(walkieFoundFlag);
+
+        StopPingLoop();
         EnqueueVO(voWalkieFound, subWalkieFound, viaWalkie: voWalkieFoundViaWalkie);
     }
 
@@ -199,22 +269,18 @@ public class ActTwoDirector : MonoBehaviour
 
     IEnumerator LeverInstalledFlow(LeverBase lever)
     {
-        // 1) VO
         EnqueueVO(voLeverInstalled, subLeverInstalled, viaWalkie: voLeverInstalledViaWalkie);
 
-        // 2) Wait until VO queue is empty (and ensures subtitles clear)
         if (VoiceLineQueue.Instance != null)
             yield return VoiceLineQueue.Instance.WaitUntilIdle();
         else
             PersistentHUD.Instance?.ClearSubtitle();
 
-        // 3) Elevator SFX
         var src = elevatorSource ? elevatorSource : PickVoSourceForWalkieFlag(false);
         if (src && elevatorMoveClip) src.PlayOneShot(elevatorMoveClip);
 
         yield return new WaitForSeconds(0.2f);
 
-        // 4) Transfer
         if (lever != null)
             lever.PullAndTransfer();
     }

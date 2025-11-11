@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Playables;
+using System; // Required for StringComparison
 
 /// <summary>
 /// One anchor per scene for the L5→L1 chase.
@@ -28,9 +29,18 @@ public class SceneChaseAnchor : MonoBehaviour
     public string nextNodeId;     // e.g. "L4_Start"
     public string nextSpawnId;    // optional spawn where next level should start
 
+    // NEW FIELDS FOR CONDITIONAL JUMP
+    [Header("Level 1 Ending Decision")]
+    [Tooltip("If nextScene is 'Level1' and required conditions are met, jump to this node.")]
+    public string goodEndingNodeId; // e.g., "L1_Good"
+    [Tooltip("If nextScene is 'Level1' and required conditions are NOT met, jump to this node.")]
+    public string badEndingNodeId;  // e.g., "L1_Bad"
+
     [Header("Final Node? (outside/cave exit)")]
     public bool isFinalNode = false;
-
+    // ... (rest of the script is unchanged)
+    
+    // --------- Timeline helpers (optional) ---------
     [Header("Barrier (optional)")]
     public GameObject barrierPlane;
     [Tooltip("If true, SetBarrier(true) will enable the plane on play; SetBarrier(false) disables it on stop.")]

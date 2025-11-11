@@ -4668,6 +4668,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1134557386}
   - component: {fileID: 1134557385}
+  - component: {fileID: 1134557387}
   m_Layer: 0
   m_Name: SceneChaseAnchor
   m_TagString: Untagged
@@ -4694,6 +4695,8 @@ MonoBehaviour:
   nextScene: Level 4 Cave
   nextNodeId: L4_Middle
   nextSpawnId: Level4_BackFrom5
+  goodEndingNodeId: 
+  badEndingNodeId: 
   isFinalNode: 0
   barrierPlane: {fileID: 0}
   activateBarrierOnPlay: 0
@@ -4717,6 +4720,36 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1134557387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1134557384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalReceiver
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: b96f2ed3eff19734eb6dcfc4903538e3, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1134557385}
+          m_TargetAssemblyTypeName: SceneChaseAnchor, Assembly-CSharp
+          m_MethodName: StartTimelineQTE
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1001 &1142575981
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9338,7 +9371,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78e3367f9e5399e48a9e939d6af15531, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpawnMarker
-  spawnId: Level5_Entrace
+  spawnId: Level5_Entrance
   applyRotation: 1
 --- !u!4 &1865628406
 Transform:
@@ -9723,7 +9756,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bb025d9058711b4d830d34f68e4f6a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LeverBase
-  leverId: L2_MainLever
+  leverId: L5_MainLever
   requiredItemId: 
   startInstalled: 1
   installThenPull: 0
@@ -9918,11 +9951,11 @@ MonoBehaviour:
   introSubtitle: <i>[You]</i> Dad? Dad?? Are you here.
   introExtraHold: 0.6
   requiredDynamite: 3
-  requireQteSuccessForGoodEnding: 1
+  requireQteSuccessForGoodEnding: 0
   fadeOut: 0.8
   fadeIn: 1.2
-  goodSpawnId: FromChase_Good
-  badSpawnId: FromChase_Bad
+  goodSpawnId: 
+  badSpawnId: 
   autoPlayCredits: 1
   creditsGood: {fileID: 32900000, guid: 42711b31bb04ff542a2d10e1017a7557, type: 3}
   creditsBad: {fileID: 32900000, guid: 42711b31bb04ff542a2d10e1017a7557, type: 3}
@@ -10415,6 +10448,8 @@ PlayableDirector:
     value: {fileID: 1585421849}
   - key: {fileID: 6626321013442066308, guid: fc30436b5cb6f984ba9a0c3f2009d881, type: 2}
     value: {fileID: 0}
+  - key: {fileID: -688087160490963114, guid: fc30436b5cb6f984ba9a0c3f2009d881, type: 2}
+    value: {fileID: 1134557387}
   m_ExposedReferences:
     m_References:
     - 332ff2f105aa4ea4d8e4e9458d5c3e2a: {fileID: 0}
