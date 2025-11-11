@@ -1,22 +1,22 @@
-using UnityEngine;
+using System;
 
-public class DynamiteTracker : MonoBehaviour
+public static class DynamiteTracker
 {
+    // readable from anywhere, writable only inside this class
     public static int SessionCount { get; private set; }
-    public static string SaveKeyPrefix = "Dyn_";
 
-    public static void AddOne(string pickupId)
+    public static event Action<int> OnChanged;
+
+    public static void Add(int amount = 1)
     {
-        SessionCount++;
-        if (SaveFlags.Instance) SaveFlags.Instance.Set(SaveKeyPrefix + pickupId);
+        SessionCount += amount;
+        if (SessionCount < 0) SessionCount = 0;
+        OnChanged?.Invoke(SessionCount);
     }
 
-    public static void BootstrapFromSave(string[] knownPickupIds)
+    public static void Reset()
     {
         SessionCount = 0;
-        if (SaveFlags.Instance == null || knownPickupIds == null) return;
-        foreach (var id in knownPickupIds)
-            if (SaveFlags.Instance.Has(SaveKeyPrefix + id))
-                SessionCount++;
+        OnChanged?.Invoke(SessionCount);
     }
 }
