@@ -628,71 +628,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 246828181}
   m_CullTransparentMesh: 1
---- !u!1 &283934071 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4586633326216796365, guid: 9a5d91fe8c9669f4d8c62b20c1498637, type: 3}
-  m_PrefabInstance: {fileID: 870003183}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &283934072
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 283934071}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64e692d705f172540ae019469d59e0ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BoxDrag
-  size: 2
-  canBeCarried: 0
-  holdDistance: 2
-  breakDistance: 9
-  maxPlayerDragRadius: 3
-  minPlayerDragRadius: 0
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  maxSlopeAngle: 45
-  groundRayDistance: 12
-  kpGround: 12
-  kdGround: 6.9
-  maxPlanarAcceleration: 25
-  maxDragSpeedGround: 4.5
-  groundStickForce: 24
-  groundSnapDistance: 0.25
-  keepUpright: 1
-  hardUprightWhileDrag: 0
-  maxTiltDeg: 8
-  uprightKp: 120
-  uprightKd: 18
-  maxAngularSpeedDeg: 180
-  comLowerWhileDrag: 0.1
-  lowFrictionMaterial: {fileID: 0}
-  linearDragWhileDrag: 4
-  angularDragWhileDrag: 2
-  scrollRotateDegreesPerNotch: 8
-  invertScroll: 0
---- !u!114 &283934078
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 283934071}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d09440f28bd18474eacd7a81460badba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BoxDragInteractable
-  promptCanvas: {fileID: 0}
-  promptLabel: {fileID: 0}
-  promptText: Press E to interact
-  oneShot: 0
-  onInteract:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &306773913 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7672182251921384738, guid: c7bf33b4e49f89f47b4b2a73af997c66, type: 3}
@@ -907,71 +842,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!1 &362475411 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3234896681229809100, guid: 73f8e627fe2775b46bd72d701a2744d2, type: 3}
-  m_PrefabInstance: {fileID: 1207088367}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &362475412
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 362475411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64e692d705f172540ae019469d59e0ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BoxDrag
-  size: 0
-  canBeCarried: 1
-  holdDistance: 2
-  breakDistance: 9
-  maxPlayerDragRadius: 3
-  minPlayerDragRadius: 0
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  maxSlopeAngle: 45
-  groundRayDistance: 12
-  kpGround: 12
-  kdGround: 6.9
-  maxPlanarAcceleration: 25
-  maxDragSpeedGround: 4.5
-  groundStickForce: 24
-  groundSnapDistance: 0.25
-  keepUpright: 1
-  hardUprightWhileDrag: 0
-  maxTiltDeg: 8
-  uprightKp: 120
-  uprightKd: 18
-  maxAngularSpeedDeg: 180
-  comLowerWhileDrag: 0.1
-  lowFrictionMaterial: {fileID: 0}
-  linearDragWhileDrag: 4
-  angularDragWhileDrag: 2
-  scrollRotateDegreesPerNotch: 8
-  invertScroll: 0
---- !u!114 &362475418
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 362475411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d09440f28bd18474eacd7a81460badba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BoxDragInteractable
-  promptCanvas: {fileID: 0}
-  promptLabel: {fileID: 0}
-  promptText: Press E to interact
-  oneShot: 0
-  onInteract:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1001 &388987785
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1024,17 +894,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1287381121239167009, guid: d9b351d286670f74781ce38907bc981d, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2087306369116454512, guid: d9b351d286670f74781ce38907bc981d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1118318164}
-    - targetCorrespondingSourceObject: {fileID: 2087306369116454512, guid: d9b351d286670f74781ce38907bc981d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1118318158}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d9b351d286670f74781ce38907bc981d, type: 3}
 --- !u!1 &498449863
 GameObject:
@@ -2587,17 +2450,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LargeBox
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8949622901961203907, guid: 9a5d91fe8c9669f4d8c62b20c1498637, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4586633326216796365, guid: 9a5d91fe8c9669f4d8c62b20c1498637, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 283934078}
-    - targetCorrespondingSourceObject: {fileID: 4586633326216796365, guid: 9a5d91fe8c9669f4d8c62b20c1498637, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 283934072}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9a5d91fe8c9669f4d8c62b20c1498637, type: 3}
 --- !u!1 &900076207
 GameObject:
@@ -4373,17 +4229,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SmallBox
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 477010403451083430, guid: 73f8e627fe2775b46bd72d701a2744d2, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3234896681229809100, guid: 73f8e627fe2775b46bd72d701a2744d2, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 362475418}
-    - targetCorrespondingSourceObject: {fileID: 3234896681229809100, guid: 73f8e627fe2775b46bd72d701a2744d2, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 362475412}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 73f8e627fe2775b46bd72d701a2744d2, type: 3}
 --- !u!1001 &1227544539
 PrefabInstance:

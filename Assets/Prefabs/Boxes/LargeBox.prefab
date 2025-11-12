@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 7233965056591766775}
   - component: {fileID: 3765353629477562987}
   - component: {fileID: 7474350081010213840}
-  - component: {fileID: 8949622901961203907}
+  - component: {fileID: 5866985212453122040}
+  - component: {fileID: 703241250095415132}
   m_Layer: 0
   m_Name: LargeBox
   m_TagString: Untagged
@@ -29,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4586633326216796365}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.751, y: 0.7907441, z: 13.45}
   m_LocalScale: {x: 120, y: 120, z: 120}
   m_ConstrainProportionsScale: 0
@@ -140,7 +141,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8949622901961203907
+--- !u!114 &5866985212453122040
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -149,7 +150,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 4586633326216796365}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2393c6e3a52d1d499abcb8f4c173a77, type: 3}
+  m_Script: {fileID: 11500000, guid: d09440f28bd18474eacd7a81460badba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoxDragInteractable
+  promptCanvas: {fileID: 0}
+  promptLabel: {fileID: 0}
+  promptText: Press E to interact
+  oneShot: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &703241250095415132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4586633326216796365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64e692d705f172540ae019469d59e0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoxDrag
   size: 2

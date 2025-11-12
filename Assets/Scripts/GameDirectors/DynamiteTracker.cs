@@ -1,22 +1,26 @@
-using UnityEngine;
+using System;
 
-public class DynamiteTracker : MonoBehaviour
+public static class DynamiteTracker
 {
-    public static int SessionCount { get; private set; }
-    public static string SaveKeyPrefix = "Dyn_";
+    // Initialize SessionCount to 0 explicitly.
+    // NOTE: C# guarantees this, but explicit initialization prevents potential confusion
+    // and ensures consistency across all environments.
+    public static int SessionCount { get; private set; } = 0; 
 
-    public static void AddOne(string pickupId)
+    public static event Action<int> OnChanged;
+
+    public static void Add(int amount = 1)
     {
-        SessionCount++;
-        if (SaveFlags.Instance) SaveFlags.Instance.Set(SaveKeyPrefix + pickupId);
+        SessionCount += amount;
+        if (SessionCount < 0) SessionCount = 0;
+        OnChanged?.Invoke(SessionCount);
+        // Added log for debugging the director
+        UnityEngine.Debug.Log($"[DynamiteTracker] Added {amount}. Total: {SessionCount}"); 
     }
 
-    public static void BootstrapFromSave(string[] knownPickupIds)
+    public static void Reset()
     {
         SessionCount = 0;
-        if (SaveFlags.Instance == null || knownPickupIds == null) return;
-        foreach (var id in knownPickupIds)
-            if (SaveFlags.Instance.Has(SaveKeyPrefix + id))
-                SessionCount++;
+        OnChanged?.Invoke(SessionCount);
     }
 }
