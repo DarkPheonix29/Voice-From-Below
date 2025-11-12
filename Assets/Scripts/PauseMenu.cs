@@ -17,14 +17,21 @@ public class PauseMenu : MonoBehaviour
     [Header("Scene Namen")]
     public string mainMenuSceneName = "MainMenu";
 
-    [Header("Te disablen components (optioneel, handmatig)")]
-    [Tooltip("Sleep hier je look/move scripts in (bv. FirstPersonController, CameraLook). "
-           + "Ze worden uit gezet bij pauze, aan bij resume.")]
+    [Header("Input (alleen gebruikt bij Old Input)")]
+    public KeyCode legacyToggleKey = KeyCode.Escape;
+
+    [Header("Gameplay UI verbergen")]
+    [Tooltip("Naam van je speler-UI root. Wordt automatisch gezocht en onzichtbaar gemaakt tijdens pauze.")]
+    public string playerUiObjectName = "UI - Player interact";
+
+    [Tooltip("Extra objecten die mee verborgen moeten worden (optioneel).")]
+    public GameObject[] hideWhilePaused; // extra’s, optioneel
+
+    [Header("Optioneel: scripts/inputs uitschakelen tijdens pauze")]
     public MonoBehaviour[] disableWhilePaused;
 
 #if ENABLE_INPUT_SYSTEM
     [Header("New Input System (optioneel)")]
-    [Tooltip("PlayerInput van je speler. Bij pauze schakelen we naar UI of disablen we alle maps.")]
     public UnityEngine.InputSystem.PlayerInput playerInput;
     public string gameplayActionMap = "Gameplay";
     public string uiActionMap = "UI";
@@ -38,6 +45,7 @@ public class PauseMenu : MonoBehaviour
     bool prevCursorVisible;
 
     readonly List<VideoPlayer> pausedVideos = new();
+    GameObject cachedPlayerUi; // ← hier cachen we "UI - Player interact"
 
     void Awake()
     {
@@ -45,6 +53,29 @@ public class PauseMenu : MonoBehaviour
         if (settingsPanel)    settingsPanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
         IsPaused = false;
+
+        // probeer meteen te vinden
+        cachedPlayerUi = FindPlayerUI();
+    }
+
+    GameObject FindPlayerUI()
+    {
+        // 1) directe naam-zoek
+        if (!string.IsNullOrWhiteSpace(playerUiObjectName))
+        {
+            var go = GameObject.Find(playerUiObjectName);
+            if (go) return go;
+        }
+        // 2) fallback: zoek een object met vergelijkbare naam
+        var all = FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var t in all)
+        {
+            if (!t) continue;
+            var n = t.name.ToLowerInvariant();
+            if (n.Contains("ui") && n.Contains("player") && n.Contains("interact"))
+                return t.gameObject;
+        }
+        return null;
     }
 
     void Update()
@@ -72,7 +103,7 @@ public class PauseMenu : MonoBehaviour
         bool gpSelect = Gamepad.current != null && Gamepad.current.selectButton.wasPressedThisFrame;
         return esc || gpStart || gpSelect;
 #elif ENABLE_LEGACY_INPUT_MANAGER
-        return Input.GetKeyDown(KeyCode.Escape);
+        return Input.GetKeyDown(legacyToggleKey);
 #else
         return false;
 #endif
@@ -92,7 +123,6 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 0f;
         AudioListener.pause = true;
 
-        // Lopende VideoPlayers pauzeren
         pausedVideos.Clear();
         var videos = FindObjectsByType<VideoPlayer>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var vp in videos)
@@ -104,10 +134,9 @@ public class PauseMenu : MonoBehaviour
             }
         }
 
-        // Gameplay-input blokkeren
-        DisableGameplayInput_Aggressive();
+        DisableGameplayInput();
+        SetGameplayUIVisible(false);
 
-        // Cursor vrij voor UI
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -131,7 +160,8 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = prevTimeScale == 0f ? 1f : prevTimeScale;
         AudioListener.pause = prevAudioPaused;
 
-        EnableGameplayInput_Aggressive();
+        EnableGameplayInput();
+        SetGameplayUIVisible(true);
 
         Cursor.lockState = prevLockMode;
         Cursor.visible = prevCursorVisible;
@@ -188,7 +218,9 @@ public class PauseMenu : MonoBehaviour
         AudioListener.pause = false;
         pausedVideos.Clear();
         IsPaused = false;
-        EnableGameplayInput_Aggressive();
+
+        EnableGameplayInput();
+        SetGameplayUIVisible(true);
     }
 
     void LoadMainMenu()
@@ -201,38 +233,36 @@ public class PauseMenu : MonoBehaviour
 
     void SaveGame()
     {
-        // TODO: vervang door je eigen save-systeem
-        Debug.Log("PauseMenu: SaveGame() aangeroepen (hier jouw save-logica).");
+        Debug.Log("PauseMenu: SaveGame() aangeroepen.");
     }
 
-    // ====== Agressief (auto) uitschakelen van look/move ======
-    void DisableGameplayInput_Aggressive()
+    // ====== Gameplay UI zichtbaar/onzichtbaar ======
+    void SetGameplayUIVisible(bool visible)
     {
-        // 1) Handmatig opgegeven componenten uit
+        // hoofd UI op naam
+        if (!cachedPlayerUi || !cachedPlayerUi.scene.IsValid())
+            cachedPlayerUi = FindPlayerUI();
+
+        if (cachedPlayerUi) cachedPlayerUi.SetActive(visible);
+
+        // eventuele extra’s
+        if (hideWhilePaused != null)
+        {
+            foreach (var go in hideWhilePaused)
+                if (go) go.SetActive(visible);
+        }
+    }
+
+    // ====== besturing tijdelijk uit/aan (optioneel) ======
+    void DisableGameplayInput()
+    {
         if (disableWhilePaused != null)
         {
             foreach (var mb in disableWhilePaused)
                 if (mb && mb.enabled) mb.enabled = false;
         }
 
-        // 2) Bekende look/move-controllers automatisch uitschakelen op naam
-        AutoToggleByTypeName(false, new[]
-        {
-            "FirstPersonController",
-            "ThirdPersonController",
-            "StarterAssetsInputs",
-            "PlayerController",
-            "CharacterControllerMover",
-            "CameraLook",
-            "MouseLook",
-            "CinemachineInputProvider",
-            "FreeLookCam",
-            "FPSController",
-            "TPPController"
-        });
-
 #if ENABLE_INPUT_SYSTEM
-        // 3) PlayerInput -> UI map of alles disablen
         if (playerInput)
         {
             var actions = playerInput.actions;
@@ -247,33 +277,15 @@ public class PauseMenu : MonoBehaviour
 #endif
     }
 
-    void EnableGameplayInput_Aggressive()
+    void EnableGameplayInput()
     {
-        // 1) Handmatig opgegeven componenten aan
         if (disableWhilePaused != null)
         {
             foreach (var mb in disableWhilePaused)
                 if (mb && !mb.enabled) mb.enabled = true;
         }
 
-        // 2) Bekende look/move-controllers weer aan
-        AutoToggleByTypeName(true, new[]
-        {
-            "FirstPersonController",
-            "ThirdPersonController",
-            "StarterAssetsInputs",
-            "PlayerController",
-            "CharacterControllerMover",
-            "CameraLook",
-            "MouseLook",
-            "CinemachineInputProvider",
-            "FreeLookCam",
-            "FPSController",
-            "TPPController"
-        });
-
 #if ENABLE_INPUT_SYSTEM
-        // 3) PlayerInput -> gameplay map of alles enablen
         if (playerInput)
         {
             var actions = playerInput.actions;
@@ -286,24 +298,4 @@ public class PauseMenu : MonoBehaviour
         }
 #endif
     }
-
-    // Helper: zet componenten aan/uit op basis van type-naam (zonder hard dependency)
-    void AutoToggleByTypeName(bool enable, string[] typeNames)
-    {
-        var behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (var mb in behaviours)
-        {
-            if (!mb) continue;
-            var n = mb.GetType().Name;
-            for (int i = 0; i < typeNames.Length; i++)
-            {
-                if (n == typeNames[i])
-                {
-                    mb.enabled = enable;
-                    break;
-                }
-            }
-        }
-    }
 }
-

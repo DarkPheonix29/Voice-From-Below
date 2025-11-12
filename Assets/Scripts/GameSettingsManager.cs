@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Video;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using System;
 
 public class GameSettingsManager : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class GameSettingsManager : MonoBehaviour
 
     Volume globalVolume;
     ColorAdjustments colorAdj;
+
+    // 👉 Nieuw event om te luisteren naar muissensitiviteit
+    public event Action<float> OnMouseSensitivityChanged;
 
     void Awake()
     {
@@ -75,11 +79,16 @@ public class GameSettingsManager : MonoBehaviour
         }
     }
 
+    // ========= SETTINGS FUNCTIES =========
+
     public void SetMouseSensitivity(float value)
     {
         MouseSensitivity = Mathf.Clamp(value, 0.1f, 3f);
         PlayerPrefs.SetFloat(KEY_SENS, MouseSensitivity);
         PlayerPrefs.Save();
+
+        // 👉 Roep event aan
+        OnMouseSensitivityChanged?.Invoke(MouseSensitivity);
     }
 
     public void SetMasterVolume(float value)
@@ -98,15 +107,12 @@ public class GameSettingsManager : MonoBehaviour
         ApplyBrightness();
     }
 
-    // ---------- aangepaste helderheid ----------
     void ApplyBrightness()
     {
         if (!colorAdj) return;
-        // Map 0..1 → -1.2 .. +1.0  ≈ 30% .. 150%
         float exposure = Mathf.Lerp(-1.2f, 1.0f, Brightness01);
         colorAdj.postExposure.Override(exposure);
     }
-    // -------------------------------------------
 
     void ApplyVolume()
     {

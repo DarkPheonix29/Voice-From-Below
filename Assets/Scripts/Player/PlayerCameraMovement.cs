@@ -1,14 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[DisallowMultipleComponent]
 public class cam : MonoBehaviour
 {
-    public Transform playerbody;    // player root for yaw
-    public Transform pitchTarget;   // usually CameraPivot (this object)
-    public Transform bobTarget;     // NEW: the HeadBob child
+    public Transform playerbody;
+    public Transform pitchTarget;
+    public Transform bobTarget;
 
-    // Dit blijft je "basis"-multiplier (kan je per wapen/scene tunen)
     [Range(0.1f, 10f)] public float sensitivity = 1f;
 
     public float bobAmplitude = 0.05f;
@@ -18,8 +16,6 @@ public class cam : MonoBehaviour
     public float moveThreshold = 0.02f;
     public float sprintBobMultiplier = 1.8f;
     public float crouchBobMultiplier = 0.5f;
-    float effectiveSens = 1f;
-
 
     float xRot;
     InputAction look;
@@ -30,15 +26,10 @@ public class cam : MonoBehaviour
     CharacterController cc;
     FPPlayer player;
 
-    bool _pausedByCutscene;
-
-    public void PauseForCutscene(bool pause) { _pausedByCutscene = pause; if (pause) bobPhase = 0f; }
-
     void Awake()
     {
-        // Initial setup for references and input actions
         if (!pitchTarget) pitchTarget = transform;
-        if (!bobTarget) bobTarget = pitchTarget; 
+        if (!bobTarget) bobTarget = pitchTarget;
 
         Cursor.lockState = CursorLockMode.Locked;
 
@@ -46,71 +37,40 @@ public class cam : MonoBehaviour
         look = map.AddAction("Look");
         look.AddBinding("<Mouse>/delta");
         map.Enable();
-        
-        // Get components early
-        cc = playerbody.GetComponent<CharacterController>();
-        player = playerbody.GetComponent<FPPlayer>();
 
-        // Temporarily set restLocalPos to zero/initial value.
-        // The *correct* value will be captured in the coroutine.
-        restLocalPos = bobTarget.localPosition; 
-    }
+        cc = playerbody ? playerbody.GetComponent<CharacterController>() : null;
+        player = playerbody ? playerbody.GetComponent<FPPlayer>() : null;
 
-    void Start()
-    {
-        // Lees elke frame de waarde uit de Settings (werkt live tijdens slepen)
-   float uiSens = GameSettingsManager.Instance ? GameSettingsManager.Instance.MouseSensitivity : 1f;
-float effectiveSens = sensitivity * uiSens;
-
-        // Start the coroutine to wait until the player has landed.
-        StartCoroutine(InitializeCameraPositionAfterLanding());
-    }
-
-    System.Collections.IEnumerator InitializeCameraPositionAfterLanding()
-    {
-        // 1. Wait for one frame to let all Start() methods and initial physics run.
-        yield return null; 
-
-        // 2. Wait until the Character Controller is grounded. This handles the fall.
-        if (cc != null)
-        {
-            while (!cc.isGrounded)
-            {
-                yield return null;
-            }
-        }
-
-        // 3. Now the player has landed and the position is finalized.
-        // CAPTURE THE TRUE RESTING POSITION HERE.
         restLocalPos = bobTarget.localPosition;
-        lastBodyPos = playerbody.position;
+        lastBodyPos = playerbody ? playerbody.position : Vector3.zero;
     }
 
     void LateUpdate()
     {
-        if (_pausedByCutscene) return;
+        if (PauseMenu.IsPaused) return;
 
-        // Note: We skip input and rotation for the first few frames until restLocalPos is set.
-        // This is generally fine since the player won't be moving much yet.
-        
         Vector2 delta = look.ReadValue<Vector2>();
-        float mouseX = delta.x * 0.075f * effectiveSens;
-        float mouseY = delta.y * 0.075f * effectiveSens;
+
+        // 🟢 Nieuw: haal gevoeligheid uit GameSettingsManager
+        float uiSens = GameSettingsManager.Instance ? GameSettingsManager.Instance.MouseSensitivity : 1f;
+        float effSens = sensitivity * uiSens;
+
+        // Gebruik de effectieve gevoeligheid
+        float mouseX = delta.x * 0.075f * effSens;
+        float mouseY = delta.y * 0.075f * effSens;
 
         xRot -= mouseY;
         xRot = Mathf.Clamp(xRot, -90f, 90f);
         if (pitchTarget) pitchTarget.localRotation = Quaternion.Euler(xRot, 0, 0);
-
         if (playerbody) playerbody.Rotate(Vector3.up * mouseX);
 
         HeadWobble();
-    } 
+    }
 
     void HeadWobble()
     {
-        // Only run bob/sway logic if the rest position has been successfully captured.
-        if (restLocalPos == Vector3.zero && bobTarget.localPosition != Vector3.zero) return;
         if (!bobTarget) return;
+        if (playerbody == null) return;
 
         Vector3 bodyDelta = playerbody.position - lastBodyPos;
         lastBodyPos = playerbody.position;
