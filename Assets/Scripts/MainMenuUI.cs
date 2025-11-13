@@ -11,8 +11,8 @@ public class MainMenuUI : MonoBehaviour
     [Header("Hoofdpanelen")]
     public GameObject mainPanel;
     public GameObject settingsPanel;
-    public GameObject loadSavesPanel; // full-screen panel for save loading
-    public GameObject windowPanel;    // window in LoadSavesPanel (title + slots + list)
+    public GameObject loadSavesPanel; // full-screen load panel
+    public GameObject windowPanel;    // window with title + slots list
     public GameObject actionPanel;    // small panel with Load/Delete/Cancel
 
     [Header("Action panel")]
@@ -25,31 +25,25 @@ public class MainMenuUI : MonoBehaviour
     public Image brightnessOverlay;
 
     [Header("Continue / Load UI")]
-    public Button continueButton;            // Hide if no saves
-    public Transform loadListContainer;      // Parent for instantiated rows
-    public GameObject loadItemPrefab;        // Prefab with two TMP texts + a Button
+    public Button continueButton;      // optional "Continue" button on main panel
+    public Transform loadListContainer; // assign SlotsRoot here
 
     [Header("Load Panel UX")]
-    [Tooltip("Optional: label that says 'No saves found' inside the load panel.")]
     public TextMeshProUGUI emptyLabel;
-    [Tooltip("If true, will create a SaveFlags object at runtime when missing.")]
     public bool autoBootstrapSaveFlags = true;
-
-    [Tooltip("Enable pressing Escape to go back from the Load panel.")]
     public bool enableEscapeBack = true;
 
-    // Internal
+    // internal
     private List<SaveFlags.SaveRecord> cachedSaves = new();
-    private int currentSlot = -1; // index in cachedSaves for action panel
+    private int currentSlot = -1; // index into cachedSaves (0..2)
 
     void Awake()
     {
-        // Ensure SaveFlags exists in the Main Menu scene (singleton destroys dupes later).
         if (!SaveFlags.Instance && autoBootstrapSaveFlags)
         {
             var go = new GameObject("SaveFlags_AutoBootstrap");
             go.AddComponent<SaveFlags>();
-            Debug.Log("[MainMenuUI] Auto-bootstrapped SaveFlags in main menu scene.");
+            Debug.Log("[MainMenuUI] Auto-bootstrapped SaveFlags.");
         }
     }
 
@@ -68,17 +62,17 @@ public class MainMenuUI : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[MainMenuUI] SaveFlags.Instance is NULL. Add SaveFlags to main menu scene or enable autoBootstrapSaveFlags.");
+            Debug.LogWarning("[MainMenuUI] SaveFlags.Instance is NULL.");
         }
 
-        RefreshSavesUI();
-
-        // Make sure panels start in a sane state
+        // sane initial state
         if (mainPanel) mainPanel.SetActive(true);
         if (settingsPanel) settingsPanel.SetActive(false);
         if (loadSavesPanel) loadSavesPanel.SetActive(false);
         if (windowPanel) windowPanel.SetActive(true);
         if (actionPanel) actionPanel.SetActive(false);
+
+        RefreshSavesUI();
     }
 
     void Update()
@@ -86,11 +80,8 @@ public class MainMenuUI : MonoBehaviour
 #if ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM
         if (enableEscapeBack && loadSavesPanel && loadSavesPanel.activeSelf && Input.GetKeyDown(KeyCode.Escape))
         {
-            // If action panel is up, cancel that first; else close the whole load menu.
-            if (actionPanel && actionPanel.activeSelf)
-                OnActionCancelPressed();
-            else
-                CloseLoadMenu();
+            if (actionPanel && actionPanel.activeSelf) OnActionCancelPressed();
+            else CloseLoadMenu();
         }
 #endif
     }
@@ -104,7 +95,7 @@ public class MainMenuUI : MonoBehaviour
         brightnessOverlay.color = c;
     }
 
-    // ------------------ Main Menu ------------------
+    // -------- Main menu --------
 
     public void StartGame()
     {
@@ -113,13 +104,11 @@ public class MainMenuUI : MonoBehaviour
             Debug.LogWarning("[MainMenuUI] firstLevelSceneName is empty.");
             return;
         }
-        Debug.Log("[MainMenuUI] StartGame");
         SceneManager.LoadScene(firstLevelSceneName);
     }
 
     public void OpenSettings()
     {
-        Debug.Log("[MainMenuUI] OpenSettings");
         if (mainPanel) mainPanel.SetActive(false);
         if (loadSavesPanel) loadSavesPanel.SetActive(false);
         if (actionPanel) actionPanel.SetActive(false);
@@ -129,7 +118,6 @@ public class MainMenuUI : MonoBehaviour
 
     public void CloseSettings()
     {
-        Debug.Log("[MainMenuUI] CloseSettings");
         if (settingsPanel) settingsPanel.SetActive(false);
         if (mainPanel) mainPanel.SetActive(true);
 
@@ -142,7 +130,6 @@ public class MainMenuUI : MonoBehaviour
 
     public void QuitGame()
     {
-        Debug.Log("[MainMenuUI] QuitGame");
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
@@ -150,15 +137,12 @@ public class MainMenuUI : MonoBehaviour
 #endif
     }
 
-    // ------------------ Continue / Load ------------------
+    // -------- Continue / Load --------
 
     void RefreshSavesUI()
     {
-        cachedSaves = SaveFlags.Instance ? SaveFlags.Instance.GetAllSaves()
-                                         : new List<SaveFlags.SaveRecord>();
-
+        cachedSaves = SaveFlags.Instance ? SaveFlags.Instance.GetAllSaves() : new List<SaveFlags.SaveRecord>();
         bool hasAny = cachedSaves != null && cachedSaves.Count > 0;
-
         if (continueButton)
         {
             continueButton.gameObject.SetActive(hasAny);
@@ -168,28 +152,28 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnContinueButton()
     {
-        if (!SaveFlags.Instance) { Debug.LogWarning("[MainMenuUI] No SaveFlags in scene."); return; }
+        if (!SaveFlags.Instance) { Debug.LogWarning("[MainMenuUI] No SaveFlags."); return; }
         var rec = SaveFlags.Instance.GetMostRecentSave();
         if (rec == null)
         {
-            Debug.Log("[MainMenuUI] No recent save found. Hiding Continue.");
             if (continueButton) continueButton.gameObject.SetActive(false);
             return;
         }
         StartFromSave(rec);
     }
 
-    // Entry point from your "Load Game" button on the main panel
-    public void LoadGame()
-    {
-        OpenLoadMenu();
-    }
+    public void LoadGame() => OpenLoadMenu();
 
-    // ------------------ Load Saves panel ------------------
+    // -------- Load panel --------
 
     public void OpenLoadMenu()
     {
-        Debug.Log("[MainMenuUI] OpenLoadMenu");
+        if (!loadListContainer)
+        {
+            Debug.LogWarning("[MainMenuUI] Assign loadListContainer (SlotsRoot).");
+            return;
+        }
+
         currentSlot = -1;
 
         if (mainPanel) mainPanel.SetActive(false);
@@ -199,14 +183,12 @@ public class MainMenuUI : MonoBehaviour
         if (windowPanel) windowPanel.SetActive(true);
         if (actionPanel) actionPanel.SetActive(false);
 
-        BuildLoadList();
+        BuildFixedSlotList(); // <- uses Slot1/2/3 under SlotsRoot
     }
 
     public void CloseLoadMenu()
     {
-        Debug.Log("[MainMenuUI] CloseLoadMenu");
         currentSlot = -1;
-
         if (actionPanel) actionPanel.SetActive(false);
         if (windowPanel) windowPanel.SetActive(true);
         if (loadSavesPanel) loadSavesPanel.SetActive(false);
@@ -214,140 +196,114 @@ public class MainMenuUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Populates the list inside the window panel. Each row loads directly,
-    /// but you can switch it to select + action panel if you want.
+    /// Populate the three fixed slot buttons (Slot1/Slot2/Slot3) and wire clicks.
     /// </summary>
-    void BuildLoadList()
+    void BuildFixedSlotList()
     {
-        if (!loadListContainer) { Debug.LogWarning("[MainMenuUI] loadListContainer not set."); return; }
-        if (!loadItemPrefab) { Debug.LogWarning("[MainMenuUI] loadItemPrefab not set."); return; }
-
-        // clear previous
-        for (int i = loadListContainer.childCount - 1; i >= 0; i--)
-            Destroy(loadListContainer.GetChild(i).gameObject);
-
         var saves = SaveFlags.Instance ? SaveFlags.Instance.GetAllSaves() : new List<SaveFlags.SaveRecord>();
-        int count = saves?.Count ?? 0;
-        Debug.Log($"[MainMenuUI] Building load list. Saves found = {count}");
+        saves = saves?.OrderByDescending(s => s.unixTimeUtc).ToList() ?? new List<SaveFlags.SaveRecord>();
+        cachedSaves = saves; // so SelectSlot and OnLoadPressed can use it
 
-        if (emptyLabel) emptyLabel.gameObject.SetActive(count == 0);
+        int total = saves.Count;
+        if (emptyLabel) emptyLabel.gameObject.SetActive(total == 0);
 
-        if (count == 0) return;
-
-        // newest first
-        saves = saves.OrderByDescending(s => s.unixTimeUtc).ToList();
-
-        // keep a cached copy for action-panel selection
-        cachedSaves = saves;
-
-        for (int i = 0; i < saves.Count; i++)
+        for (int i = 0; i < 3; i++)
         {
-            var s = saves[i];
+            var slot = loadListContainer.Find($"Slot{i + 1}");
+            if (!slot) continue;
 
-            var go = Instantiate(loadItemPrefab, loadListContainer);
-            go.name = $"SaveItem_{s.sceneName}_{s.unixTimeUtc}";
+            var btn = slot.GetComponent<Button>();
+            var title = slot.Find("TitleText")?.GetComponent<TextMeshProUGUI>();
+            var time = slot.Find("TimeText")?.GetComponent<TextMeshProUGUI>();
 
-            // Expect prefab has:
-            // - child TMP: "TitleText"
-            // - child TMP: "TimeText"
-            // - Button on root (or "LoadButton") to select
-            var title = go.transform.Find("TitleText")?.GetComponent<TextMeshProUGUI>();
-            var time  = go.transform.Find("TimeText")?.GetComponent<TextMeshProUGUI>();
-            var btn   = go.GetComponent<Button>() ?? go.transform.Find("LoadButton")?.GetComponent<Button>();
+            // Clear previous listeners to avoid stacking
+            if (btn) btn.onClick.RemoveAllListeners();
 
-            if (title) title.text = string.IsNullOrEmpty(s.sceneName) ? "(Unknown Scene)" : s.sceneName;
-            if (time)
+            if (i < total)
             {
-                var dt = DateTimeOffset.FromUnixTimeSeconds(s.unixTimeUtc).ToLocalTime().DateTime;
-                time.text = dt.ToString("yyyy-MM-dd HH:mm");
-            }
+                var s = saves[i];
+                if (title) title.text = string.IsNullOrEmpty(s.sceneName) ? "(Unknown Scene)" : s.sceneName;
+                if (time)
+                {
+                    var dt = DateTimeOffset.FromUnixTimeSeconds(s.unixTimeUtc).ToLocalTime().DateTime;
+                    time.text = dt.ToString("yyyy-MM-dd HH:mm");
+                }
 
-            if (btn)
-            {
-                btn.onClick.RemoveAllListeners();
-
-                // Choose behavior:
-                // A) Load immediately:
-                //btn.onClick.AddListener(() => StartFromSave(s));
-
-                // B) Or show the action panel for this slot:
-                int capturedIndex = i;
-                btn.onClick.AddListener(() => SelectSlot(capturedIndex));
+                if (btn)
+                {
+                    int captured = i;
+                    btn.interactable = true;
+                    btn.onClick.AddListener(() => SelectSlot(captured));
+                }
             }
             else
             {
-                Debug.LogWarning($"{go.name}: No Button found. Add a Button to the root or a child named 'LoadButton'.");
+                if (title) title.text = "Empty Slot";
+                if (time) time.text = "";
+                if (btn) btn.interactable = false; // prevent invalid index clicks
             }
         }
     }
 
-    // Select a row to open the small action panel (Load/Delete/Cancel)
     public void SelectSlot(int slotIndex)
     {
         if (cachedSaves == null || slotIndex < 0 || slotIndex >= cachedSaves.Count)
         {
-            Debug.LogWarning($"[MainMenuUI] SelectSlot: invalid index {slotIndex}.");
+            Debug.LogWarning("[MainMenuUI] SelectSlot: invalid index " + slotIndex);
             return;
         }
 
-        Debug.Log("[MainMenuUI] SelectSlot geklikt, slot = " + slotIndex);
         currentSlot = slotIndex;
 
         if (actionTitle)
-            actionTitle.text = $"Save slot {slotIndex + 1}: {cachedSaves[slotIndex].sceneName}";
+        {
+            var s = cachedSaves[slotIndex];
+            actionTitle.text = $"Save slot {slotIndex + 1}: {s.sceneName}";
+        }
 
         if (windowPanel) windowPanel.SetActive(false);
         if (actionPanel) actionPanel.SetActive(true);
     }
 
-    // ------------------ ActionPanel knoppen ------------------
+    // -------- Action panel buttons --------
 
     public void OnLoadPressed()
     {
-        Debug.Log("[MainMenuUI] OnLoadPressed, currentSlot = " + currentSlot);
         if (currentSlot < 0 || currentSlot >= cachedSaves.Count)
         {
             Debug.LogWarning("[MainMenuUI] OnLoadPressed: invalid slot.");
             return;
         }
-
-        var rec = cachedSaves[currentSlot];
-        StartFromSave(rec);
+        StartFromSave(cachedSaves[currentSlot]);
     }
 
     public void OnDeletePressed()
     {
-        Debug.Log("[MainMenuUI] OnDeletePressed, currentSlot = " + currentSlot);
-        // TODO: implement SaveFlags delete if desired (not included in SaveFlags yet).
-        // For now, just go back:
+        // Not implemented: you can add a delete method on SaveFlags if needed.
         OnActionCancelPressed();
-        BuildLoadList(); // refresh list after potential deletion in future
+        BuildFixedSlotList(); // refresh labels/buttons
     }
 
     public void OnActionCancelPressed()
     {
-        Debug.Log("[MainMenuUI] OnActionCancelPressed");
         currentSlot = -1;
         if (actionPanel) actionPanel.SetActive(false);
         if (windowPanel) windowPanel.SetActive(true);
     }
 
-    // ------------------ Load a record ------------------
+    // -------- Load record --------
 
     void StartFromSave(SaveFlags.SaveRecord rec)
     {
         if (rec == null) return;
-
         if (!SaveFlags.Instance)
         {
-            Debug.LogWarning("[MainMenuUI] StartFromSave: SaveFlags not present; cannot apply flags.");
+            Debug.LogWarning("[MainMenuUI] StartFromSave: SaveFlags missing.");
             return;
         }
 
-        // Make these flags the active profile
         SaveFlags.Instance.LoadFromRecord(rec, replaceSaved: true);
 
-        // Load target scene; SceneSaveBootstrap will re-apply dynamic state on Start()
         if (!string.IsNullOrEmpty(rec.sceneName))
             SceneManager.LoadScene(rec.sceneName);
         else

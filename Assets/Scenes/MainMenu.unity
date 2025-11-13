@@ -3418,6 +3418,12 @@ MonoBehaviour:
   actionPanel: {fileID: 332829501}
   actionTitle: {fileID: 1880955011}
   firstLevelSceneName: Level 1
+  brightnessOverlay: {fileID: 0}
+  continueButton: {fileID: 470981297}
+  loadListContainer: {fileID: 214960886}
+  emptyLabel: {fileID: 0}
+  autoBootstrapSaveFlags: 1
+  enableEscapeBack: 1
 --- !u!4 &653793170
 Transform:
   m_ObjectHideFlags: 0
