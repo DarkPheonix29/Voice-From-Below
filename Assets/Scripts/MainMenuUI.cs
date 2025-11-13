@@ -8,17 +8,20 @@ using TMPro;
 
 public class MainMenuUI : MonoBehaviour
 {
-    [Header("Panels")]
+    [Header("Hoofdpanelen")]
     public GameObject mainPanel;
     public GameObject settingsPanel;
-    public GameObject loadPanel;             // panel that lists saves
+    public GameObject loadSavesPanel; // full-screen panel for save loading
+    public GameObject windowPanel;    // window in LoadSavesPanel (title + slots + list)
+    public GameObject actionPanel;    // small panel with Load/Delete/Cancel
 
-    [Header("Scene Settings")]
-    [Tooltip("Naam van de eerste scene die wordt geladen bij Start Game.")]
+    [Header("Action panel")]
+    public TextMeshProUGUI actionTitle;
+
+    [Header("Start level")]
     public string firstLevelSceneName = "Level 1";
 
-    [Header("Brightness Overlay")]
-    [Tooltip("Wijs hier je 'Darkoverlay' Image toe (boven de video).")]
+    [Header("Brightness Overlay (optional)")]
     public Image brightnessOverlay;
 
     [Header("Continue / Load UI")]
@@ -32,11 +35,12 @@ public class MainMenuUI : MonoBehaviour
     [Tooltip("If true, will create a SaveFlags object at runtime when missing.")]
     public bool autoBootstrapSaveFlags = true;
 
-    // optional: let Esc go back from Load panel
     [Tooltip("Enable pressing Escape to go back from the Load panel.")]
     public bool enableEscapeBack = true;
 
-    List<SaveFlags.SaveRecord> cachedSaves = new();
+    // Internal
+    private List<SaveFlags.SaveRecord> cachedSaves = new();
+    private int currentSlot = -1; // index in cachedSaves for action panel
 
     void Awake()
     {
@@ -68,17 +72,27 @@ public class MainMenuUI : MonoBehaviour
         }
 
         RefreshSavesUI();
+
+        // Make sure panels start in a sane state
+        if (mainPanel) mainPanel.SetActive(true);
+        if (settingsPanel) settingsPanel.SetActive(false);
+        if (loadSavesPanel) loadSavesPanel.SetActive(false);
+        if (windowPanel) windowPanel.SetActive(true);
+        if (actionPanel) actionPanel.SetActive(false);
     }
 
     void Update()
     {
-        if (enableEscapeBack && loadPanel && loadPanel.activeSelf)
-        {
 #if ENABLE_LEGACY_INPUT_MANAGER || !ENABLE_INPUT_SYSTEM
-            if (Input.GetKeyDown(KeyCode.Escape))
-                CloseLoadPanel();
-#endif
+        if (enableEscapeBack && loadSavesPanel && loadSavesPanel.activeSelf && Input.GetKeyDown(KeyCode.Escape))
+        {
+            // If action panel is up, cancel that first; else close the whole load menu.
+            if (actionPanel && actionPanel.activeSelf)
+                OnActionCancelPressed();
+            else
+                CloseLoadMenu();
         }
+#endif
     }
 
     void ApplyOverlay(float v01)
@@ -90,7 +104,7 @@ public class MainMenuUI : MonoBehaviour
         brightnessOverlay.color = c;
     }
 
-    // ================= MAIN MENU BUTTONS =================
+    // ------------------ Main Menu ------------------
 
     public void StartGame()
     {
@@ -99,43 +113,23 @@ public class MainMenuUI : MonoBehaviour
             Debug.LogWarning("[MainMenuUI] firstLevelSceneName is empty.");
             return;
         }
+        Debug.Log("[MainMenuUI] StartGame");
         SceneManager.LoadScene(firstLevelSceneName);
-    }
-
-    public void LoadGame() // open the load list panel
-    {
-        BuildLoadList();
-
-        if (!mainPanel) Debug.LogWarning("[MainMenuUI] mainPanel not assigned.");
-        if (!settingsPanel) Debug.LogWarning("[MainMenuUI] settingsPanel not assigned.");
-        if (!loadPanel) { Debug.LogWarning("[MainMenuUI] loadPanel not assigned."); return; }
-
-        if (mainPanel) mainPanel.SetActive(false);
-        if (settingsPanel) settingsPanel.SetActive(false);
-        loadPanel.SetActive(true);
-    }
-
-    public void CloseLoadPanel()
-    {
-        if (!loadPanel || !mainPanel)
-        {
-            Debug.LogWarning("[MainMenuUI] CloseLoadPanel(): loadPanel or mainPanel not assigned.");
-            return;
-        }
-
-        loadPanel.SetActive(false);
-        mainPanel.SetActive(true);
     }
 
     public void OpenSettings()
     {
+        Debug.Log("[MainMenuUI] OpenSettings");
         if (mainPanel) mainPanel.SetActive(false);
-        if (loadPanel) loadPanel.SetActive(false);
+        if (loadSavesPanel) loadSavesPanel.SetActive(false);
+        if (actionPanel) actionPanel.SetActive(false);
+        if (windowPanel) windowPanel.SetActive(true);
         if (settingsPanel) settingsPanel.SetActive(true);
     }
 
     public void CloseSettings()
     {
+        Debug.Log("[MainMenuUI] CloseSettings");
         if (settingsPanel) settingsPanel.SetActive(false);
         if (mainPanel) mainPanel.SetActive(true);
 
@@ -148,7 +142,7 @@ public class MainMenuUI : MonoBehaviour
 
     public void QuitGame()
     {
-        Debug.Log("Quit Game");
+        Debug.Log("[MainMenuUI] QuitGame");
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
@@ -156,7 +150,7 @@ public class MainMenuUI : MonoBehaviour
 #endif
     }
 
-    // ================= CONTINUE / LOAD =================
+    // ------------------ Continue / Load ------------------
 
     void RefreshSavesUI()
     {
@@ -185,6 +179,44 @@ public class MainMenuUI : MonoBehaviour
         StartFromSave(rec);
     }
 
+    // Entry point from your "Load Game" button on the main panel
+    public void LoadGame()
+    {
+        OpenLoadMenu();
+    }
+
+    // ------------------ Load Saves panel ------------------
+
+    public void OpenLoadMenu()
+    {
+        Debug.Log("[MainMenuUI] OpenLoadMenu");
+        currentSlot = -1;
+
+        if (mainPanel) mainPanel.SetActive(false);
+        if (settingsPanel) settingsPanel.SetActive(false);
+
+        if (loadSavesPanel) loadSavesPanel.SetActive(true);
+        if (windowPanel) windowPanel.SetActive(true);
+        if (actionPanel) actionPanel.SetActive(false);
+
+        BuildLoadList();
+    }
+
+    public void CloseLoadMenu()
+    {
+        Debug.Log("[MainMenuUI] CloseLoadMenu");
+        currentSlot = -1;
+
+        if (actionPanel) actionPanel.SetActive(false);
+        if (windowPanel) windowPanel.SetActive(true);
+        if (loadSavesPanel) loadSavesPanel.SetActive(false);
+        if (mainPanel) mainPanel.SetActive(true);
+    }
+
+    /// <summary>
+    /// Populates the list inside the window panel. Each row loads directly,
+    /// but you can switch it to select + action panel if you want.
+    /// </summary>
     void BuildLoadList()
     {
         if (!loadListContainer) { Debug.LogWarning("[MainMenuUI] loadListContainer not set."); return; }
@@ -205,8 +237,13 @@ public class MainMenuUI : MonoBehaviour
         // newest first
         saves = saves.OrderByDescending(s => s.unixTimeUtc).ToList();
 
-        foreach (var s in saves)
+        // keep a cached copy for action-panel selection
+        cachedSaves = saves;
+
+        for (int i = 0; i < saves.Count; i++)
         {
+            var s = saves[i];
+
             var go = Instantiate(loadItemPrefab, loadListContainer);
             go.name = $"SaveItem_{s.sceneName}_{s.unixTimeUtc}";
 
@@ -228,8 +265,14 @@ public class MainMenuUI : MonoBehaviour
             if (btn)
             {
                 btn.onClick.RemoveAllListeners();
-                var captured = s;
-                btn.onClick.AddListener(() => StartFromSave(captured));
+
+                // Choose behavior:
+                // A) Load immediately:
+                //btn.onClick.AddListener(() => StartFromSave(s));
+
+                // B) Or show the action panel for this slot:
+                int capturedIndex = i;
+                btn.onClick.AddListener(() => SelectSlot(capturedIndex));
             }
             else
             {
@@ -237,6 +280,59 @@ public class MainMenuUI : MonoBehaviour
             }
         }
     }
+
+    // Select a row to open the small action panel (Load/Delete/Cancel)
+    public void SelectSlot(int slotIndex)
+    {
+        if (cachedSaves == null || slotIndex < 0 || slotIndex >= cachedSaves.Count)
+        {
+            Debug.LogWarning($"[MainMenuUI] SelectSlot: invalid index {slotIndex}.");
+            return;
+        }
+
+        Debug.Log("[MainMenuUI] SelectSlot geklikt, slot = " + slotIndex);
+        currentSlot = slotIndex;
+
+        if (actionTitle)
+            actionTitle.text = $"Save slot {slotIndex + 1}: {cachedSaves[slotIndex].sceneName}";
+
+        if (windowPanel) windowPanel.SetActive(false);
+        if (actionPanel) actionPanel.SetActive(true);
+    }
+
+    // ------------------ ActionPanel knoppen ------------------
+
+    public void OnLoadPressed()
+    {
+        Debug.Log("[MainMenuUI] OnLoadPressed, currentSlot = " + currentSlot);
+        if (currentSlot < 0 || currentSlot >= cachedSaves.Count)
+        {
+            Debug.LogWarning("[MainMenuUI] OnLoadPressed: invalid slot.");
+            return;
+        }
+
+        var rec = cachedSaves[currentSlot];
+        StartFromSave(rec);
+    }
+
+    public void OnDeletePressed()
+    {
+        Debug.Log("[MainMenuUI] OnDeletePressed, currentSlot = " + currentSlot);
+        // TODO: implement SaveFlags delete if desired (not included in SaveFlags yet).
+        // For now, just go back:
+        OnActionCancelPressed();
+        BuildLoadList(); // refresh list after potential deletion in future
+    }
+
+    public void OnActionCancelPressed()
+    {
+        Debug.Log("[MainMenuUI] OnActionCancelPressed");
+        currentSlot = -1;
+        if (actionPanel) actionPanel.SetActive(false);
+        if (windowPanel) windowPanel.SetActive(true);
+    }
+
+    // ------------------ Load a record ------------------
 
     void StartFromSave(SaveFlags.SaveRecord rec)
     {
