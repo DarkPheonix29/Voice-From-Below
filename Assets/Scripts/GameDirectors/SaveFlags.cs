@@ -324,6 +324,39 @@ public class SaveFlags : MonoBehaviour
         }
         return string.Join("/", stack);
     }
+
+    // ==== APPLY / LOAD A SAVE ====
+    public void ApplyFlagsSnapshot(IEnumerable<string> flags, bool replaceSaved = true, bool writeToPlayerPrefs = true)
+    {
+        if (flags == null) return;
+
+        if (replaceSaved)
+            savedFlags.Clear();
+
+        foreach (var f in flags)
+            if (!string.IsNullOrEmpty(f))
+                savedFlags.Add(f);
+
+        if (writeToPlayerPrefs && enablePersistence)
+        {
+            // wipe old keys for safety (optional but keeps prefs tidy for single-profile)
+            // If you have a known registry of IDs, you can iterate that instead.
+            // PlayerPrefs.DeleteAll(); // <- uncomment only if you're okay clearing everything!
+            foreach (var id in savedFlags)
+                PlayerPrefs.SetInt(keyPrefix + id, 1);
+            PlayerPrefs.Save();
+        }
+
+        // we’re starting from a loaded save -> session flags should be empty
+        sessionFlags.Clear();
+    }
+
+    /// <summary>Apply the given save record (flags snapshot) to become the active progress.</summary>
+    public void LoadFromRecord(SaveRecord rec, bool replaceSaved = true)
+    {
+        if (rec == null) return;
+        ApplyFlagsSnapshot(rec.flags, replaceSaved, writeToPlayerPrefs: true);
+    }
 }
 
 /// <summary>

@@ -49,8 +49,8 @@ public class PauseMenu : MonoBehaviour
 
     void Awake()
     {
-        if (pausePanel)       pausePanel.SetActive(false);
-        if (settingsPanel)    settingsPanel.SetActive(false);
+        if (pausePanel) pausePanel.SetActive(false);
+        if (settingsPanel) settingsPanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
         IsPaused = false;
 
@@ -98,8 +98,8 @@ public class PauseMenu : MonoBehaviour
     bool PressedPauseThisFrame()
     {
 #if ENABLE_INPUT_SYSTEM
-        bool esc      = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
-        bool gpStart  = Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame;
+        bool esc = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
+        bool gpStart = Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame;
         bool gpSelect = Gamepad.current != null && Gamepad.current.selectButton.wasPressedThisFrame;
         return esc || gpStart || gpSelect;
 #elif ENABLE_LEGACY_INPUT_MANAGER
@@ -140,8 +140,8 @@ public class PauseMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        if (pausePanel)       pausePanel.SetActive(true);
-        if (settingsPanel)    settingsPanel.SetActive(false);
+        if (pausePanel) pausePanel.SetActive(true);
+        if (settingsPanel) settingsPanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
     }
 
@@ -150,8 +150,8 @@ public class PauseMenu : MonoBehaviour
         if (!IsPaused) return;
         IsPaused = false;
 
-        if (pausePanel)       pausePanel.SetActive(false);
-        if (settingsPanel)    settingsPanel.SetActive(false);
+        if (pausePanel) pausePanel.SetActive(false);
+        if (settingsPanel) settingsPanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
 
         foreach (var vp in pausedVideos) if (vp) vp.Play();
@@ -173,23 +173,23 @@ public class PauseMenu : MonoBehaviour
     public void OnOpenSettingsButton()
     {
         if (!IsPaused) PauseGame();
-        if (pausePanel)       pausePanel.SetActive(false);
+        if (pausePanel) pausePanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
-        if (settingsPanel)    settingsPanel.SetActive(true);
+        if (settingsPanel) settingsPanel.SetActive(true);
     }
 
     public void OnCloseSettingsButton() => CloseSettings();
     void CloseSettings()
     {
         if (settingsPanel) settingsPanel.SetActive(false);
-        if (pausePanel)    pausePanel.SetActive(true);
+        if (pausePanel) pausePanel.SetActive(true);
     }
 
     public void OnBackToMainMenuButton()
     {
         if (!IsPaused) PauseGame();
-        if (pausePanel)       pausePanel.SetActive(false);
-        if (settingsPanel)    settingsPanel.SetActive(false);
+        if (pausePanel) pausePanel.SetActive(false);
+        if (settingsPanel) settingsPanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(true);
     }
 
@@ -204,11 +204,11 @@ public class PauseMenu : MonoBehaviour
     }
 
     public void OnSaveConfirmYes() { RestoreRealtime(); SaveGame(); LoadMainMenu(); }
-    public void OnSaveConfirmNo()  { RestoreRealtime(); LoadMainMenu(); }
+    public void OnSaveConfirmNo() { RestoreRealtime(); LoadMainMenu(); }
     public void OnSaveConfirmCancel()
     {
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
-        if (pausePanel)       pausePanel.SetActive(true);
+        if (pausePanel) pausePanel.SetActive(true);
     }
 
     // ===================== Helpers =====================
@@ -233,7 +233,19 @@ public class PauseMenu : MonoBehaviour
 
     void SaveGame()
     {
-        Debug.Log("PauseMenu: SaveGame() aangeroepen.");
+        // Persist all current session flags
+        SaveFlags.Instance?.Commit();
+
+        // Persist dynamic scene objects (e.g., boxes) for the current level
+        var active = SceneManager.GetActiveScene();
+        if (active.IsValid())
+        {
+            SaveFlags.Instance?.SaveSceneDynamicState(active.name);
+            // Also ensure there is an autosave slot for this level (created once)
+            SaveFlags.Instance?.RecordLevelEntryAndSave(active.name);
+        }
+
+        Debug.Log("PauseMenu: SaveGame() complete.");
     }
 
     // ====== Gameplay UI zichtbaar/onzichtbaar ======
