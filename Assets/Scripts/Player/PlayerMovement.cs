@@ -76,6 +76,9 @@ public class FPPlayer : MonoBehaviour
     // world-space delta cache
     Vector3 _lastWorldPos;
 
+    public bool IsCrouching => isCrouching;
+    public bool IsSprinting => isSprinting;
+
     void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -84,6 +87,7 @@ public class FPPlayer : MonoBehaviour
             climber = GetComponent<PlayerClimber>();
             if (!climber) climber = GetComponentInChildren<PlayerClimber>(true);
         }
+
         stamina = maxStamina;
 
         var map = new InputActionMap("Player");
@@ -100,8 +104,12 @@ public class FPPlayer : MonoBehaviour
         {
             staminaBar.minValue = 0f;
             staminaBar.maxValue = maxStamina;
-            staminaBar.value = maxStamina;
+            staminaBar.value    = maxStamina;
         }
+
+        if (staminaFill) staminaFill.enabled = false;
+        if (staminaGroup) staminaGroup.alpha = 0f;
+
         if (body) bodyScaleStart = body.localScale;
 
         if (cameraTransform == null)
@@ -114,8 +122,6 @@ public class FPPlayer : MonoBehaviour
             camBaseLocalY = cameraTransform.localPosition.y;
             EnsureCameraPivot();
         }
-
-        if (staminaGroup) staminaGroup.alpha = 0f;
 
         standHeight = controller.height;
         standCenter = controller.center;
@@ -147,7 +153,6 @@ public class FPPlayer : MonoBehaviour
 
     bool CCReadyNow()
     {
-        // require enabled AND activeInHierarchy, and not in snap phase
         return controller && controller.enabled && controller.gameObject.activeInHierarchy
                && !(climber && climber.IsSnapping);
     }
@@ -156,7 +161,6 @@ public class FPPlayer : MonoBehaviour
     {
         if (!initialized) return;
 
-        // If CC is disabled or snapping this frame, skip all motion safely.
         if (!CCReadyNow())
         {
             if (footsteps)
@@ -176,23 +180,19 @@ public class FPPlayer : MonoBehaviour
 
         bool climbingNow = (climber && climber.IsClimbing);
 
-        // Grounded query guarded
         isGrounded = controller.isGrounded;
         if (isGrounded && velocity.y < 0f) velocity.y = -2f;
 
-        // Input + state
         Vector2 input = move.ReadValue<Vector2>();
         Vector3 moveDir = transform.right * input.x + transform.forward * input.y;
 
         HandleCrouch();
         HandleSprint(input);
 
-        // Only move/apply gravity when NOT climbing
         if (!climbingNow)
         {
             float currentSpeed = isCrouching ? crouchSpeed : (isSprinting ? sprintSpeed : walkSpeed);
 
-            // Re-check just before each Move
             if (CCReadyNow()) controller.Move(moveDir * currentSpeed * Time.deltaTime);
 
             if (isGrounded && jump.WasPressedThisFrame() && !isCrouching)
@@ -204,16 +204,14 @@ public class FPPlayer : MonoBehaviour
         }
         else
         {
-            velocity = Vector3.zero; // no gravity while climbing
+            velocity = Vector3.zero;
         }
 
-        // horizontal world speed from delta
         Vector3 now = transform.position;
         float horizDist = Vector3.ProjectOnPlane(now - _lastWorldPos, Vector3.up).magnitude;
         float worldHorizSpeed = horizDist / Mathf.Max(Time.deltaTime, 0.0001f);
         _lastWorldPos = now;
 
-        // feed footsteps
         if (footsteps)
         {
             footsteps.isRunning     = isSprinting;
@@ -327,9 +325,6 @@ public class FPPlayer : MonoBehaviour
         }
     }
 
-    public bool IsCrouching => isCrouching;
-    public bool IsSprinting => isSprinting;
-
     void EnsureCameraPivot()
     {
         if (cameraTransform == null) return;
@@ -356,6 +351,29 @@ public class FPPlayer : MonoBehaviour
         {
             footsteps.moveSpeed = 0f;
             footsteps.verticalSpeed = 0f;
+        }
+    }
+
+    /// <summary>
+    /// Reset stamina to full and hide the bar (used when loading a level/new game).
+    /// </summary>
+    public void ResetStaminaToFull()
+    {
+        stamina = maxStamina;
+
+        if (staminaBar)
+        {
+            staminaBar.value = maxStamina;
+        }
+
+        if (staminaFill)
+        {
+            staminaFill.enabled = false;
+        }
+
+        if (staminaGroup)
+        {
+            staminaGroup.alpha = 0f;
         }
     }
 }

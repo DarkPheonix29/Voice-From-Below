@@ -4,8 +4,9 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// SaveFlags: now also manages lightweight autosave slots (first time entering a level)
-/// and per-scene dynamic state (e.g., box transforms) across level transfers.
+/// SaveFlags: manages story flags, autosave/manual save slots,
+/// and per-scene dynamic state (e.g., box transforms).
+/// Also stores a simple player position/rotation per save.
 /// </summary>
 public class SaveFlags : MonoBehaviour
 {
@@ -28,14 +29,20 @@ public class SaveFlags : MonoBehaviour
     [Tooltip("Tag used to find box objects whose transforms should be persisted across transfers.")]
     public string boxTag = "Box";
 
-    // -------------------- Save Slots (Autosave on first entry) --------------------
+    // -------------------- Save Slots (Auto + Manual) --------------------
 
     [Serializable]
     public class SaveRecord
     {
         public string sceneName;
-        public long unixTimeUtc;       // when recorded (first entry time)
-        public List<string> flags;     // snapshot of all saved+session flags at that time (optional/helpful)
+        public long unixTimeUtc;           // when recorded
+        public List<string> flags;         // snapshot of all saved+session flags
+        public bool isAuto = true;         // true = autosave, false = manual
+        public int manualSlotIndex = -1;   // 0,1,... for manual slots; -1 = none
+
+        // simple player pose
+        public Vector3 playerPosition;
+        public Quaternion playerRotation;
     }
 
     [Serializable]
@@ -44,6 +51,7 @@ public class SaveFlags : MonoBehaviour
         public List<SaveRecord> records = new List<SaveRecord>();
     }
 
+    // NOTE: name kept for backwards compatibility; now stores auto+manual.
     private const string SaveSlotsKey = "autosave_slots_v1";
 
     // -------------------- Per-Scene Dynamic State (Boxes) --------------------
@@ -72,7 +80,7 @@ public class SaveFlags : MonoBehaviour
         LoadSavedFromPlayerPrefs();
     }
 
-    // -------------------- Flags API (unchanged behavior) --------------------
+    // -------------------- Flags API --------------------
 
     /// <summary>True if the flag is completed either in this session or from a previous save.</summary>
     public bool Has(string id)
@@ -143,37 +151,85 @@ public class SaveFlags : MonoBehaviour
         }
     }
 
-    // -------------------- AUTOSAVE SLOTS (First-time level entry) --------------------
+    // -------------------- AUTOSAVE SLOTS --------------------
 
     /// <summary>
-    /// Call this when entering a level. If it's the first time ever entering this scene,
-    /// create a new autosave slot (one slot per level, created only once).
+    /// First-time level entry autosave: create an autosave record ONLY if none exists yet for the scene.
+    /// NOTE: this does NOT store a player pose, it's only for the "first time entered" snapshot.
     /// </summary>
     public void RecordLevelEntryAndSave(string sceneName)
     {
         if (!enablePersistence || string.IsNullOrEmpty(sceneName)) return;
 
         var list = LoadSaveRecords();
-        bool alreadyHasSlotForScene = list.records.Any(r => string.Equals(r.sceneName, sceneName, StringComparison.OrdinalIgnoreCase));
-        if (alreadyHasSlotForScene)
-            return; // Only the first time you ever enter this scene becomes a slot.
 
-        // Merge both saved + current session flags into the snapshot.
-        var snapshotFlags = new HashSet<string>(savedFlags);
-        foreach (var f in sessionFlags) snapshotFlags.Add(f);
+        bool alreadyHasAuto = list.records.Any(r =>
+            r.isAuto &&
+            string.Equals(r.sceneName, sceneName, StringComparison.OrdinalIgnoreCase));
+
+        if (alreadyHasAuto)
+            return; // already have an autosave for this scene
+
+        var snapshotFlags = MakeFlagsSnapshot();
 
         var rec = new SaveRecord
         {
-            sceneName = sceneName,
-            unixTimeUtc = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-            flags = snapshotFlags.ToList()
+            sceneName       = sceneName,
+            unixTimeUtc     = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            flags           = snapshotFlags,
+            isAuto          = true,
+            manualSlotIndex = -1,
+            playerPosition  = Vector3.zero,
+            playerRotation  = Quaternion.identity
         };
         list.records.Add(rec);
+        SaveSaveRecords(list);
+    }
+
+    /// <summary>
+    /// Upsert autosave for this scene (create OR update, always latest flags + player pose).
+    /// Use this when doing "Save and return to main menu".
+    /// </summary>
+    public void UpsertAutoSaveForScene(string sceneName, Vector3 playerPos, Quaternion playerRot)
+    {
+        if (!enablePersistence || string.IsNullOrEmpty(sceneName)) return;
+
+        var list = LoadSaveRecords();
+        var rec = list.records.FirstOrDefault(r =>
+            r.isAuto &&
+            string.Equals(r.sceneName, sceneName, StringComparison.OrdinalIgnoreCase));
+
+        var snapshot = MakeFlagsSnapshot();
+
+        if (rec == null)
+        {
+            rec = new SaveRecord
+            {
+                sceneName       = sceneName,
+                isAuto          = true,
+                manualSlotIndex = -1
+            };
+            list.records.Add(rec);
+        }
+
+        rec.flags          = snapshot;
+        rec.unixTimeUtc    = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        rec.playerPosition = playerPos;
+        rec.playerRotation = playerRot;
 
         SaveSaveRecords(list);
     }
 
-    /// <summary>Returns the most recent autosave slot (by time), or null if none exist.</summary>
+    public SaveRecord GetLatestAutoSave()
+    {
+        var list = LoadSaveRecords();
+        return list.records
+            .Where(r => r.isAuto)
+            .OrderByDescending(r => r.unixTimeUtc)
+            .FirstOrDefault();
+    }
+
+    /// <summary>Returns the most recent save (auto OR manual), or null if none exist.</summary>
     public SaveRecord GetMostRecentSave()
     {
         var list = LoadSaveRecords();
@@ -181,32 +237,55 @@ public class SaveFlags : MonoBehaviour
         return list.records.OrderByDescending(r => r.unixTimeUtc).FirstOrDefault();
     }
 
-    /// <summary>Returns all autosave slots (read-only list).</summary>
+    /// <summary>Returns all saves (auto + manual).</summary>
     public List<SaveRecord> GetAllSaves()
     {
         var list = LoadSaveRecords();
         return new List<SaveRecord>(list.records);
     }
 
-    private SaveRecordListWrapper LoadSaveRecords()
+    // ------------- MANUAL SLOTS -------------
+
+    /// <summary>
+    /// Save into a *manual* slot (0,1,2...). Overwrites that slot, including player pose.
+    /// </summary>
+    public void SaveManualToSlot(int slotIndex, string sceneName, Vector3 playerPos, Quaternion playerRot)
     {
-        var json = PlayerPrefs.GetString(SaveSlotsKey, "");
-        if (string.IsNullOrEmpty(json)) return new SaveRecordListWrapper();
-        try
+        if (!enablePersistence || slotIndex < 0 || string.IsNullOrEmpty(sceneName)) return;
+
+        var list = LoadSaveRecords();
+
+        var rec = list.records.FirstOrDefault(r => !r.isAuto && r.manualSlotIndex == slotIndex);
+
+        var snapshot = MakeFlagsSnapshot();
+
+        if (rec == null)
         {
-            return JsonUtility.FromJson<SaveRecordListWrapper>(json) ?? new SaveRecordListWrapper();
+            rec = new SaveRecord
+            {
+                sceneName       = sceneName,
+                isAuto          = false,
+                manualSlotIndex = slotIndex
+            };
+            list.records.Add(rec);
         }
-        catch
-        {
-            return new SaveRecordListWrapper();
-        }
+
+        rec.flags          = snapshot;
+        rec.unixTimeUtc    = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        rec.playerPosition = playerPos;
+        rec.playerRotation = playerRot;
+
+        SaveSaveRecords(list);
     }
 
-    private void SaveSaveRecords(SaveRecordListWrapper wrapper)
+    /// <summary>Get the manual save for a specific slot (0,1,2...).</summary>
+    public SaveRecord GetManualSave(int slotIndex)
     {
-        var json = JsonUtility.ToJson(wrapper);
-        PlayerPrefs.SetString(SaveSlotsKey, json);
-        PlayerPrefs.Save();
+        var list = LoadSaveRecords();
+        return list.records
+            .Where(r => !r.isAuto && r.manualSlotIndex == slotIndex)
+            .OrderByDescending(r => r.unixTimeUtc)
+            .FirstOrDefault();
     }
 
     // -------------------- PER-SCENE DYNAMIC STATE: BOX TRANSFORMS --------------------
@@ -227,9 +306,9 @@ public class SaveFlags : MonoBehaviour
             var id = TryGetStableId(go);
             states.boxes.Add(new BoxState
             {
-                id = id,
-                pos = go.transform.position,
-                rot = go.transform.rotation,
+                id   = id,
+                pos  = go.transform.position,
+                rot  = go.transform.rotation,
                 scale = go.transform.localScale
             });
         }
@@ -291,19 +370,54 @@ public class SaveFlags : MonoBehaviour
 
     // -------------------- Helpers --------------------
 
+    private List<string> MakeFlagsSnapshot()
+    {
+        var snapshot = new HashSet<string>(savedFlags);
+        foreach (var f in sessionFlags) snapshot.Add(f);
+        return snapshot.ToList();
+    }
+
+    private SaveRecordListWrapper LoadSaveRecords()
+    {
+        var json = PlayerPrefs.GetString(SaveSlotsKey, "");
+        if (string.IsNullOrEmpty(json)) return new SaveRecordListWrapper();
+        try
+        {
+            return JsonUtility.FromJson<SaveRecordListWrapper>(json) ?? new SaveRecordListWrapper();
+        }
+        catch
+        {
+            return new SaveRecordListWrapper();
+        }
+    }
+
+    private void SaveSaveRecords(SaveRecordListWrapper wrapper)
+    {
+        var json = JsonUtility.ToJson(wrapper);
+        PlayerPrefs.SetString(SaveSlotsKey, json);
+        PlayerPrefs.Save();
+    }
+
     private string SceneBoxesKey(string sceneName) => $"scene_state_boxes_v1_{sceneName}";
 
     private List<GameObject> FindBoxesInScene()
     {
-        // Tag-based. If you prefer a component filter, replace this with FindObjectsOfType<YourBoxComponent>().
-        var tagged = GameObject.FindGameObjectsWithTag(boxTag);
-        return new List<GameObject>(tagged);
+        var list = new List<GameObject>();
+        if (string.IsNullOrWhiteSpace(boxTag)) return list;
+
+        try
+        {
+            var tagged = GameObject.FindGameObjectsWithTag(boxTag);
+            if (tagged != null) list.AddRange(tagged);
+        }
+        catch (UnityException)
+        {
+            Debug.LogWarning($"SaveFlags: Tag '{boxTag}' is not defined. Either add it in Project Settings → Tags and Layers or clear boxTag.");
+        }
+
+        return list;
     }
 
-    /// <summary>
-    /// Try to obtain a stable id for an object. If a SaveId component exists, use that;
-    /// else fall back to a hierarchy path which is stable as long as the structure doesn't change.
-    /// </summary>
     private string TryGetStableId(GameObject go)
     {
         var saveId = go.GetComponent<SaveId>();
@@ -315,7 +429,6 @@ public class SaveFlags : MonoBehaviour
 
     private string GetHierarchyPath(Transform t)
     {
-        // root/child/grandchild — stable enough for static scene hierarchies
         var stack = new Stack<string>();
         while (t != null)
         {
@@ -339,15 +452,11 @@ public class SaveFlags : MonoBehaviour
 
         if (writeToPlayerPrefs && enablePersistence)
         {
-            // wipe old keys for safety (optional but keeps prefs tidy for single-profile)
-            // If you have a known registry of IDs, you can iterate that instead.
-            // PlayerPrefs.DeleteAll(); // <- uncomment only if you're okay clearing everything!
             foreach (var id in savedFlags)
                 PlayerPrefs.SetInt(keyPrefix + id, 1);
             PlayerPrefs.Save();
         }
 
-        // we’re starting from a loaded save -> session flags should be empty
         sessionFlags.Clear();
     }
 
@@ -356,6 +465,49 @@ public class SaveFlags : MonoBehaviour
     {
         if (rec == null) return;
         ApplyFlagsSnapshot(rec.flags, replaceSaved, writeToPlayerPrefs: true);
+    }
+
+    // ================= DELETE HELPERS =================
+
+    /// <summary>Delete a single save record (auto or manual).</summary>
+    public void DeleteSaveRecord(SaveRecord rec)
+    {
+        if (rec == null) return;
+
+        var list = LoadSaveRecords();
+
+        // Try reference remove first
+        bool removed = list.records.Remove(rec);
+
+        // Fallback remove by matching fields in case instances differ
+        if (!removed)
+        {
+            int count = list.records.RemoveAll(r =>
+                r != null &&
+                r.isAuto == rec.isAuto &&
+                r.manualSlotIndex == rec.manualSlotIndex &&
+                r.sceneName == rec.sceneName &&
+                r.unixTimeUtc == rec.unixTimeUtc);
+            removed = count > 0;
+        }
+
+        if (removed)
+        {
+            SaveSaveRecords(list);
+            Debug.Log("SaveFlags: deleted save record.");
+        }
+        else
+        {
+            Debug.LogWarning("SaveFlags: DeleteSaveRecord found no matching record to delete.");
+        }
+    }
+
+    /// <summary>Delete all save records (does NOT touch story flags).</summary>
+    public void DeleteAllSaveRecords()
+    {
+        var wrapper = new SaveRecordListWrapper(); // empty
+        SaveSaveRecords(wrapper);
+        Debug.Log("SaveFlags: all save records deleted.");
     }
 }
 

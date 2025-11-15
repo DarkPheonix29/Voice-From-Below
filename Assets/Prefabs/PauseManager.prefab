@@ -47,6 +47,7 @@ MonoBehaviour:
   pausePanel: {fileID: 0}
   settingsPanel: {fileID: 0}
   saveConfirmPanel: {fileID: 0}
+  saveSlotPanel: {fileID: 0}
   mainMenuSceneName: MainMenu
   legacyToggleKey: 27
   playerUiObjectName: UI - Player interact

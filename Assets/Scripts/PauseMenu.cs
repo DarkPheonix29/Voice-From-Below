@@ -2,20 +2,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Video;
+using UnityEngine.EventSystems;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 #endif
 
 public class PauseMenu : MonoBehaviour
 {
     [Header("Panels")]
-    public GameObject pausePanel;        // hoofd pauzemenu (inactive bij start)
-    public GameObject settingsPanel;     // settings (inactive bij start)
-    public GameObject saveConfirmPanel;  // bevestiging (inactive bij start)
+    public GameObject pausePanel;
+    public GameObject settingsPanel;
+    public GameObject saveConfirmPanel;
+    [Tooltip("Panel where you pick Slot 1 / Slot 2.")]
+    public GameObject saveSlotPanel;
 
     [Header("Scene Namen")]
     public string mainMenuSceneName = "MainMenu";
+
+    [Header("Player for saving position")]
+    [Tooltip("Player object whose position/rotation is stored in saves. If left empty, will try tag 'Player'.")]
+    public Transform playerTransform;
 
     [Header("Input (alleen gebruikt bij Old Input)")]
     public KeyCode legacyToggleKey = KeyCode.Escape;
@@ -25,7 +33,7 @@ public class PauseMenu : MonoBehaviour
     public string playerUiObjectName = "UI - Player interact";
 
     [Tooltip("Extra objecten die mee verborgen moeten worden (optioneel).")]
-    public GameObject[] hideWhilePaused; // extra’s, optioneel
+    public GameObject[] hideWhilePaused;
 
     [Header("Optioneel: scripts/inputs uitschakelen tijdens pauze")]
     public MonoBehaviour[] disableWhilePaused;
@@ -45,28 +53,27 @@ public class PauseMenu : MonoBehaviour
     bool prevCursorVisible;
 
     readonly List<VideoPlayer> pausedVideos = new();
-    GameObject cachedPlayerUi; // ← hier cachen we "UI - Player interact"
+    GameObject cachedPlayerUi;
 
     void Awake()
     {
-        if (pausePanel) pausePanel.SetActive(false);
-        if (settingsPanel) settingsPanel.SetActive(false);
+        if (pausePanel)      pausePanel.SetActive(false);
+        if (settingsPanel)   settingsPanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
+        if (saveSlotPanel)   saveSlotPanel.SetActive(false);
         IsPaused = false;
 
-        // probeer meteen te vinden
         cachedPlayerUi = FindPlayerUI();
     }
 
     GameObject FindPlayerUI()
     {
-        // 1) directe naam-zoek
         if (!string.IsNullOrWhiteSpace(playerUiObjectName))
         {
             var go = GameObject.Find(playerUiObjectName);
             if (go) return go;
         }
-        // 2) fallback: zoek een object met vergelijkbare naam
+
         var all = FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var t in all)
         {
@@ -84,8 +91,9 @@ public class PauseMenu : MonoBehaviour
         {
             if (IsPaused)
             {
+                if (saveSlotPanel && saveSlotPanel.activeSelf)       { OnSaveSlotCancel(); return; }
                 if (saveConfirmPanel && saveConfirmPanel.activeSelf) { OnSaveConfirmCancel(); return; }
-                if (settingsPanel && settingsPanel.activeSelf) { CloseSettings(); return; }
+                if (settingsPanel && settingsPanel.activeSelf)       { CloseSettings(); return; }
                 ResumeGame();
             }
             else
@@ -115,6 +123,19 @@ public class PauseMenu : MonoBehaviour
         if (IsPaused) return;
         IsPaused = true;
 
+        // Ensure there's an EventSystem so UI buttons work in every scene
+        if (EventSystem.current == null)
+        {
+            var esGo = new GameObject("EventSystem");
+            esGo.AddComponent<EventSystem>();
+#if ENABLE_INPUT_SYSTEM
+            esGo.AddComponent<InputSystemUIInputModule>();
+#else
+            esGo.AddComponent<StandaloneInputModule>();
+#endif
+            Debug.Log("PauseMenu: Spawned EventSystem in this scene.");
+        }
+
         prevTimeScale = Time.timeScale;
         prevAudioPaused = AudioListener.pause;
         prevLockMode = Cursor.lockState;
@@ -140,9 +161,10 @@ public class PauseMenu : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        if (pausePanel) pausePanel.SetActive(true);
-        if (settingsPanel) settingsPanel.SetActive(false);
+        if (pausePanel)      pausePanel.SetActive(true);
+        if (settingsPanel)   settingsPanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
+        if (saveSlotPanel)   saveSlotPanel.SetActive(false);
     }
 
     public void ResumeGame()
@@ -150,9 +172,10 @@ public class PauseMenu : MonoBehaviour
         if (!IsPaused) return;
         IsPaused = false;
 
-        if (pausePanel) pausePanel.SetActive(false);
-        if (settingsPanel) settingsPanel.SetActive(false);
+        if (pausePanel)      pausePanel.SetActive(false);
+        if (settingsPanel)   settingsPanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
+        if (saveSlotPanel)   saveSlotPanel.SetActive(false);
 
         foreach (var vp in pausedVideos) if (vp) vp.Play();
         pausedVideos.Clear();
@@ -173,23 +196,25 @@ public class PauseMenu : MonoBehaviour
     public void OnOpenSettingsButton()
     {
         if (!IsPaused) PauseGame();
-        if (pausePanel) pausePanel.SetActive(false);
+        if (pausePanel)      pausePanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
-        if (settingsPanel) settingsPanel.SetActive(true);
+        if (saveSlotPanel)   saveSlotPanel.SetActive(false);
+        if (settingsPanel)   settingsPanel.SetActive(true);
     }
 
     public void OnCloseSettingsButton() => CloseSettings();
     void CloseSettings()
     {
-        if (settingsPanel) settingsPanel.SetActive(false);
-        if (pausePanel) pausePanel.SetActive(true);
+        if (settingsPanel)   settingsPanel.SetActive(false);
+        if (pausePanel)      pausePanel.SetActive(true);
     }
 
     public void OnBackToMainMenuButton()
     {
         if (!IsPaused) PauseGame();
-        if (pausePanel) pausePanel.SetActive(false);
-        if (settingsPanel) settingsPanel.SetActive(false);
+        if (pausePanel)      pausePanel.SetActive(false);
+        if (settingsPanel)   settingsPanel.SetActive(false);
+        if (saveSlotPanel)   saveSlotPanel.SetActive(false);
         if (saveConfirmPanel) saveConfirmPanel.SetActive(true);
     }
 
@@ -203,15 +228,113 @@ public class PauseMenu : MonoBehaviour
 #endif
     }
 
-    public void OnSaveConfirmYes() { RestoreRealtime(); SaveGame(); LoadMainMenu(); }
-    public void OnSaveConfirmNo() { RestoreRealtime(); LoadMainMenu(); }
+    // ---- First confirm panel (Save? / Don't save / Cancel) ----
+
+    // "Save and back to main menu"
+    public void OnSaveConfirmYes()
+    {
+        if (saveSlotPanel)
+        {
+            if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
+            saveSlotPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("PauseMenu: saveSlotPanel not assigned; doing autosave only.");
+            SaveAutoForCurrentScene();
+            RestoreRealtime();
+            LoadMainMenu();
+        }
+    }
+
+    // "Don't save, just go"
+    public void OnSaveConfirmNo()
+    {
+        RestoreRealtime();
+        LoadMainMenu();
+    }
+
+    // "Cancel" on first confirm
     public void OnSaveConfirmCancel()
     {
         if (saveConfirmPanel) saveConfirmPanel.SetActive(false);
-        if (pausePanel) pausePanel.SetActive(true);
+        if (pausePanel)       pausePanel.SetActive(true);
     }
 
-    // ===================== Helpers =====================
+    // ---- Slot picker panel ----
+
+    public void OnChooseSaveSlot1() => SaveAndReturnUsingManualSlot(0);
+    public void OnChooseSaveSlot2() => SaveAndReturnUsingManualSlot(1);
+
+    public void OnSaveSlotCancel()
+    {
+        if (saveSlotPanel)    saveSlotPanel.SetActive(false);
+        if (saveConfirmPanel) saveConfirmPanel.SetActive(true);
+    }
+
+    // ===================== Saving helpers =====================
+
+    // Grab current player pose (with fallback to tag "Player")
+    void GetPlayerPose(out Vector3 pos, out Quaternion rot)
+    {
+        Transform t = playerTransform;
+        if (!t)
+        {
+            var go = GameObject.FindGameObjectWithTag("Player");
+            if (go) t = go.transform;
+        }
+
+        if (t)
+        {
+            pos = t.position;
+            rot = t.rotation;
+        }
+        else
+        {
+            pos = Vector3.zero;
+            rot = Quaternion.identity;
+        }
+    }
+
+    void SaveAutoForCurrentScene()
+    {
+        if (!SaveFlags.Instance) return;
+
+        SaveFlags.Instance.Commit();
+
+        var active = SceneManager.GetActiveScene();
+        if (!active.IsValid()) return;
+
+        SaveFlags.Instance.SaveSceneDynamicState(active.name);
+
+        GetPlayerPose(out var pos, out var rot);
+        SaveFlags.Instance.UpsertAutoSaveForScene(active.name, pos, rot);
+    }
+
+    // Called when choosing Slot 1/2 and then going to main menu
+    void SaveAndReturnUsingManualSlot(int slotIndex)
+    {
+        if (SaveFlags.Instance)
+        {
+            SaveFlags.Instance.Commit();
+
+            var active = SceneManager.GetActiveScene();
+            if (active.IsValid())
+            {
+                SaveFlags.Instance.SaveSceneDynamicState(active.name);
+
+                GetPlayerPose(out var pos, out var rot);
+
+                SaveFlags.Instance.SaveManualToSlot(slotIndex, active.name, pos, rot);
+                SaveFlags.Instance.UpsertAutoSaveForScene(active.name, pos, rot);
+            }
+        }
+
+        RestoreRealtime();
+        LoadMainMenu();
+    }
+
+    // ===================== Misc helpers =====================
     void RestoreRealtime()
     {
         Time.timeScale = 1f;
@@ -225,39 +348,22 @@ public class PauseMenu : MonoBehaviour
 
     void LoadMainMenu()
     {
+        // Make sure gameplay UI (including stamina bar) is hidden when going to main menu.
+        SetGameplayUIVisible(false);
+
         if (!string.IsNullOrEmpty(mainMenuSceneName))
             SceneManager.LoadScene(mainMenuSceneName);
         else
             Debug.LogWarning("PauseMenu: mainMenuSceneName is niet ingesteld.");
     }
 
-    void SaveGame()
-    {
-        // Persist all current session flags
-        SaveFlags.Instance?.Commit();
-
-        // Persist dynamic scene objects (e.g., boxes) for the current level
-        var active = SceneManager.GetActiveScene();
-        if (active.IsValid())
-        {
-            SaveFlags.Instance?.SaveSceneDynamicState(active.name);
-            // Also ensure there is an autosave slot for this level (created once)
-            SaveFlags.Instance?.RecordLevelEntryAndSave(active.name);
-        }
-
-        Debug.Log("PauseMenu: SaveGame() complete.");
-    }
-
-    // ====== Gameplay UI zichtbaar/onzichtbaar ======
     void SetGameplayUIVisible(bool visible)
     {
-        // hoofd UI op naam
         if (!cachedPlayerUi || !cachedPlayerUi.scene.IsValid())
             cachedPlayerUi = FindPlayerUI();
 
         if (cachedPlayerUi) cachedPlayerUi.SetActive(visible);
 
-        // eventuele extra’s
         if (hideWhilePaused != null)
         {
             foreach (var go in hideWhilePaused)
@@ -265,7 +371,6 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-    // ====== besturing tijdelijk uit/aan (optioneel) ======
     void DisableGameplayInput()
     {
         if (disableWhilePaused != null)
@@ -278,12 +383,13 @@ public class PauseMenu : MonoBehaviour
         if (playerInput)
         {
             var actions = playerInput.actions;
-            if (!string.IsNullOrEmpty(uiActionMap) && actions != null && actions.FindActionMap(uiActionMap) != null)
-                playerInput.SwitchCurrentActionMap(uiActionMap);
-            else
+            var uiMap = (!string.IsNullOrEmpty(uiActionMap) && actions != null)
+                        ? actions.FindActionMap(uiActionMap) : null;
+
+            if (uiMap != null)
             {
-                playerInput.currentActionMap?.Disable();
-                if (actions != null) foreach (var map in actions.actionMaps) map.Disable();
+                playerInput.SwitchCurrentActionMap(uiActionMap);
+                Debug.Log($"PauseMenu: switched to UI map '{uiActionMap}'.");
             }
         }
 #endif
@@ -301,8 +407,13 @@ public class PauseMenu : MonoBehaviour
         if (playerInput)
         {
             var actions = playerInput.actions;
-            if (!string.IsNullOrEmpty(gameplayActionMap) && actions != null && actions.FindActionMap(gameplayActionMap) != null)
+            var gameMap = (!string.IsNullOrEmpty(gameplayActionMap) && actions != null)
+                          ? actions.FindActionMap(gameplayActionMap) : null;
+
+            if (gameMap != null)
+            {
                 playerInput.SwitchCurrentActionMap(gameplayActionMap);
+            }
             else
             {
                 if (actions != null) foreach (var map in actions.actionMaps) map.Enable();

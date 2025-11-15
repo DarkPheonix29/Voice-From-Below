@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -34,8 +32,8 @@ public class MainMenuUI : MonoBehaviour
     public bool enableEscapeBack = true;
 
     // internal
-    private List<SaveFlags.SaveRecord> cachedSaves = new();
-    private int currentSlot = -1; // index into cachedSaves (0..2)
+    private SaveFlags.SaveRecord[] slotRecords = new SaveFlags.SaveRecord[3]; // 0=auto,1=manual0,2=manual1
+    private int currentSlot = -1; // index into slotRecords
 
     void Awake()
     {
@@ -58,14 +56,13 @@ public class MainMenuUI : MonoBehaviour
         if (SaveFlags.Instance != null)
         {
             var count = SaveFlags.Instance.GetAllSaves()?.Count ?? 0;
-            Debug.Log($"[MainMenuUI] SaveFlags alive. Found {count} autosave slots.");
+            Debug.Log($"[MainMenuUI] SaveFlags alive. Found {count} save slots.");
         }
         else
         {
             Debug.LogWarning("[MainMenuUI] SaveFlags.Instance is NULL.");
         }
 
-        // sane initial state
         if (mainPanel) mainPanel.SetActive(true);
         if (settingsPanel) settingsPanel.SetActive(false);
         if (loadSavesPanel) loadSavesPanel.SetActive(false);
@@ -141,8 +138,7 @@ public class MainMenuUI : MonoBehaviour
 
     void RefreshSavesUI()
     {
-        cachedSaves = SaveFlags.Instance ? SaveFlags.Instance.GetAllSaves() : new List<SaveFlags.SaveRecord>();
-        bool hasAny = cachedSaves != null && cachedSaves.Count > 0;
+        bool hasAny = SaveFlags.Instance && SaveFlags.Instance.GetMostRecentSave() != null;
         if (continueButton)
         {
             continueButton.gameObject.SetActive(hasAny);
@@ -183,7 +179,7 @@ public class MainMenuUI : MonoBehaviour
         if (windowPanel) windowPanel.SetActive(true);
         if (actionPanel) actionPanel.SetActive(false);
 
-        BuildFixedSlotList(); // <- uses Slot1/2/3 under SlotsRoot
+        BuildFixedSlotList();
     }
 
     public void CloseLoadMenu()
@@ -196,69 +192,83 @@ public class MainMenuUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Populate the three fixed slot buttons (Slot1/Slot2/Slot3) and wire clicks.
+    /// Populate Slot1/Slot2/Slot3:
+    ///   Slot1 = latest autosave
+    ///   Slot2 = manual slot 0
+    ///   Slot3 = manual slot 1
     /// </summary>
     void BuildFixedSlotList()
     {
-        var saves = SaveFlags.Instance ? SaveFlags.Instance.GetAllSaves() : new List<SaveFlags.SaveRecord>();
-        saves = saves?.OrderByDescending(s => s.unixTimeUtc).ToList() ?? new List<SaveFlags.SaveRecord>();
-        cachedSaves = saves; // so SelectSlot and OnLoadPressed can use it
+        if (!SaveFlags.Instance)
+        {
+            Debug.LogWarning("[MainMenuUI] No SaveFlags.");
+            return;
+        }
 
-        int total = saves.Count;
-        if (emptyLabel) emptyLabel.gameObject.SetActive(total == 0);
+        slotRecords = new SaveFlags.SaveRecord[3];
+
+        // map: 0 = auto, 1 = manual slot 0, 2 = manual slot 1
+        slotRecords[0] = SaveFlags.Instance.GetLatestAutoSave();
+        slotRecords[1] = SaveFlags.Instance.GetManualSave(0);
+        slotRecords[2] = SaveFlags.Instance.GetManualSave(1);
+
+        bool any = slotRecords[0] != null || slotRecords[1] != null || slotRecords[2] != null;
+        if (emptyLabel) emptyLabel.gameObject.SetActive(!any);
 
         for (int i = 0; i < 3; i++)
         {
+            var rec = slotRecords[i];
             var slot = loadListContainer.Find($"Slot{i + 1}");
             if (!slot) continue;
 
             var btn = slot.GetComponent<Button>();
             var title = slot.Find("TitleText")?.GetComponent<TextMeshProUGUI>();
-            var time = slot.Find("TimeText")?.GetComponent<TextMeshProUGUI>();
+            var time  = slot.Find("TimeText")?.GetComponent<TextMeshProUGUI>();
 
-            // Clear previous listeners to avoid stacking
             if (btn) btn.onClick.RemoveAllListeners();
 
-            if (i < total)
+            if (rec != null)
             {
-                var s = saves[i];
-                if (title) title.text = string.IsNullOrEmpty(s.sceneName) ? "(Unknown Scene)" : s.sceneName;
+                string labelPrefix = (i == 0) ? "Autosave" : $"Manual {i}";
+                if (title) title.text = $"{labelPrefix} - {rec.sceneName}";
                 if (time)
                 {
-                    var dt = DateTimeOffset.FromUnixTimeSeconds(s.unixTimeUtc).ToLocalTime().DateTime;
+                    var dt = DateTimeOffset.FromUnixTimeSeconds(rec.unixTimeUtc).ToLocalTime().DateTime;
                     time.text = dt.ToString("yyyy-MM-dd HH:mm");
                 }
 
                 if (btn)
                 {
-                    int captured = i;
+                    int capturedIndex = i;
                     btn.interactable = true;
-                    btn.onClick.AddListener(() => SelectSlot(captured));
+                    btn.onClick.AddListener(() => SelectSlot(capturedIndex));
                 }
             }
             else
             {
-                if (title) title.text = "Empty Slot";
+                if (title)
+                    title.text = (i == 0) ? "Autosave (empty)" : $"Manual {i} (empty)";
                 if (time) time.text = "";
-                if (btn) btn.interactable = false; // prevent invalid index clicks
+                if (btn) btn.interactable = false;
             }
         }
     }
 
     public void SelectSlot(int slotIndex)
     {
-        if (cachedSaves == null || slotIndex < 0 || slotIndex >= cachedSaves.Count)
+        if (slotIndex < 0 || slotIndex >= slotRecords.Length || slotRecords[slotIndex] == null)
         {
-            Debug.LogWarning("[MainMenuUI] SelectSlot: invalid index " + slotIndex);
+            Debug.LogWarning("[MainMenuUI] SelectSlot: invalid or empty slot " + slotIndex);
             return;
         }
 
         currentSlot = slotIndex;
+        var rec = slotRecords[slotIndex];
 
         if (actionTitle)
         {
-            var s = cachedSaves[slotIndex];
-            actionTitle.text = $"Save slot {slotIndex + 1}: {s.sceneName}";
+            string label = (slotIndex == 0) ? "Autosave" : $"Manual {slotIndex}";
+            actionTitle.text = $"{label}: {rec.sceneName}";
         }
 
         if (windowPanel) windowPanel.SetActive(false);
@@ -269,19 +279,46 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnLoadPressed()
     {
-        if (currentSlot < 0 || currentSlot >= cachedSaves.Count)
+        if (currentSlot < 0 || currentSlot >= slotRecords.Length || slotRecords[currentSlot] == null)
         {
             Debug.LogWarning("[MainMenuUI] OnLoadPressed: invalid slot.");
             return;
         }
-        StartFromSave(cachedSaves[currentSlot]);
+        StartFromSave(slotRecords[currentSlot]);
     }
 
     public void OnDeletePressed()
     {
-        // Not implemented: you can add a delete method on SaveFlags if needed.
-        OnActionCancelPressed();
-        BuildFixedSlotList(); // refresh labels/buttons
+        if (!SaveFlags.Instance)
+        {
+            Debug.LogWarning("[MainMenuUI] OnDeletePressed: SaveFlags missing.");
+            return;
+        }
+
+        if (currentSlot < 0 || currentSlot >= slotRecords.Length)
+        {
+            Debug.LogWarning("[MainMenuUI] OnDeletePressed: invalid slot index.");
+            return;
+        }
+
+        var rec = slotRecords[currentSlot];
+        if (rec == null)
+        {
+            Debug.LogWarning("[MainMenuUI] OnDeletePressed: slot is empty.");
+            return;
+        }
+
+        // delete this save record
+        SaveFlags.Instance.DeleteSaveRecord(rec);
+
+        // reset selection + UI
+        currentSlot = -1;
+        if (actionPanel) actionPanel.SetActive(false);
+        if (windowPanel) windowPanel.SetActive(true);
+
+        // refresh list & continue button
+        BuildFixedSlotList();
+        RefreshSavesUI();
     }
 
     public void OnActionCancelPressed()
